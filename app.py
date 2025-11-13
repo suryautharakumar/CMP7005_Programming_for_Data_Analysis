@@ -59,7 +59,7 @@ page = st.sidebar.radio(
 st.sidebar.markdown("---")
 
 # -------------------------------------
-# 1️⃣ Calculator Page
+# Calculator Page
 # -------------------------------------
 if page == "🏗️ Calculator":
     st.title("🧮 Smart Calculator")
@@ -88,7 +88,7 @@ if page == "🏗️ Calculator":
 
     if st.button("✨ Calculate"):
         with st.spinner("Calculating..."):
-            time.sleep(0.8)
+            time.sleep(1.8)
         if operation == "Addition (+)":
             result = num1 + num2
             st.success(f"✅ Result: **{result}**")
@@ -131,7 +131,7 @@ if page == "🏗️ Calculator":
             st.success(f"🌀 Square Root of {num1} = **{result:.2f}**")
 
 # -------------------------------------
-# 2️⃣ BMI Calculator Page
+# BMI Calculator Page
 # -------------------------------------
 elif page == "⚖️ BMI Calculator":
     st.title("⚖️ BMI Calculator")
@@ -147,7 +147,7 @@ elif page == "⚖️ BMI Calculator":
         if height_cm <= 0:
             st.error("⚠️ Height must be greater than 0.")
         else:
-            with st.spinner("Calculating BMI..."):
+            with st.spinner("calculating BMI..."):
                 time.sleep(1.8)
             height_m = height_cm / 100
             bmi = weight / (height_m ** 2)
@@ -163,7 +163,7 @@ elif page == "⚖️ BMI Calculator":
                 st.error("🔴 You are **Obese** — focus on diet and exercise.")
 
 # -------------------------------------
-# 3️⃣ Area Calculator Page
+# Area Calculator Page
 # -------------------------------------
 elif page == "📐 Area Calculator":
     st.title("📐 Area Calculator")
@@ -176,7 +176,7 @@ elif page == "📐 Area Calculator":
         radius = st.number_input("Enter the radius:", value=None, min_value=0.0)
         if st.button("Calculate Circle Area"):
             with st.spinner("Calculating..."):
-                time.sleep(0.5)
+                time.sleep(1.8)
             area = math.pi * (radius ** 2)
             st.success(f"🟣 Area of Circle = **{area:.2f}** sq. units")
 
@@ -185,7 +185,7 @@ elif page == "📐 Area Calculator":
         width = st.number_input("Enter the width:", value=None, min_value=0.0)
         if st.button("Calculate Rectangle Area"):
             with st.spinner("Calculating..."):
-                time.sleep(0.5)
+                time.sleep(1.8)
             area = length * width
             st.success(f"🟩 Area of Rectangle = **{area:.2f}** sq. units")
 
@@ -194,7 +194,7 @@ elif page == "📐 Area Calculator":
         height = st.number_input("Enter the height:", value=None, min_value=0.0)
         if st.button("Calculate Triangle Area"):
             with st.spinner("Calculating..."):
-                time.sleep(0.5)
+                time.sleep(1.8)
             area = 0.5 * base * height
             st.success(f"🔺 Area of Triangle = **{area:.2f}** sq. units")
 
