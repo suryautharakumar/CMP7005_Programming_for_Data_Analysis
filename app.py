@@ -3,7 +3,7 @@ import math
 import time
 
 # -------------------------------------
-st.set_page_config(page_title="Multi App | Surya Utharakumar", page_icon="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png", layout="centered", description="Cardiff Metropolitan University")
+st.set_page_config(page_title="Multi App | Cardiff Metropolitan University", page_icon="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png", layout="centered")
 
 # Custom page header styling
 st.markdown("""
