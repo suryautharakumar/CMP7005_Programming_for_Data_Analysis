@@ -11,10 +11,10 @@ st.markdown("""
             background-color: #f8fafc;
         }
         h1, h2, h3 {
-            color: #815854;
+            color: #b2e5f8;
         }
         .stButton>button {
-            background-color: #fcb777;
+            background-color: #eabbf1;
             color: #000000;
             border-radius: 10px;
             height: 2.8em;
@@ -25,14 +25,14 @@ st.markdown("""
             transform: scale(1);
         }
         .stButton>button:hover {
-            background-color: #815854;
-            color: #ffffff;
+            background-color: #b2e5f8;
+      
             transform: scale(0.9);
         }
         .stSelectbox label, .stNumberInput label {
             font-weight: 600;
             font-weight: bold;
-            color: #fcb777;
+            color: #eabbf1;
         }
         [data-testid="stSidebar"] {
             background-image: url("https://img.freepik.com/free-vector/colorful-gradient-background-modern-design_361591-4583.jpg?semt=ais_incoming&w=740&q=80");
@@ -196,4 +196,3 @@ elif page == "📐 Area Calculator":
 
 #Footer
 st.markdown("---")
-
