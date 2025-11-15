@@ -30,9 +30,9 @@ st.markdown("""
             transform: scale(0.9);
         }
         .stSelectbox label, .stNumberInput label {
-            font-weight: 600;
+            font-weight: 800;
             font-weight: bold;
-            color: #eabbf1;
+            color: #ec64fc;
         }
         [data-testid="stSidebar"] {
             background-image: url("https://img.freepik.com/free-vector/colorful-gradient-background-modern-design_361591-4583.jpg?semt=ais_incoming&w=740&q=80");
