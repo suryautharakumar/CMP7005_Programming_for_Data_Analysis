@@ -1,11 +1,12 @@
+%%writefile app.py
+
 import streamlit as st
 import math
 import time
 
-# -------------------------------------
-st.set_page_config(page_title="Multi App | Surya Utharakumar", page_icon="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png", layout="centered")
+st.set_page_config(page_title="Multi App | Cardiff Metropolitan University", page_icon="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png", layout="centered")
 
-# Custom page header styling
+#header css styling
 st.markdown("""
     <style>
         .main {
@@ -35,13 +36,16 @@ st.markdown("""
             font-weight: bold;
             color: #fcb777;
         }
-
+        [data-testid="stSidebar"] {
+            background-image: url("https://img.freepik.com/free-vector/colorful-gradient-background-modern-design_361591-4583.jpg?semt=ais_incoming&w=740&q=80");
+            background-size: cover;
+            background-repeat: no-repeat; 
+            background-position: center; 
+        }
     </style>
 """, unsafe_allow_html=True)
 
-# -------------------------------------
-#  Sidebar Navigation
-# -------------------------------------
+#Sidebar
 st.sidebar.markdown(
     """
     <div style="display: flex; align-items: center; margin-bottom: 20px;">
@@ -58,9 +62,7 @@ page = st.sidebar.radio(
 )
 st.sidebar.markdown("---")
 
-# -------------------------------------
-# Calculator Page
-# -------------------------------------
+#Calculator Page
 if page == "🏗️ Calculator":
     st.title("🧮 Smart Calculator")
     st.write("Perform basic arithmetic and interest calculations instantly.")
@@ -130,9 +132,7 @@ if page == "🏗️ Calculator":
             result = math.sqrt(num1)
             st.success(f"🌀 Square Root of {num1} = **{result:.2f}**")
 
-# -------------------------------------
-# BMI Calculator Page
-# -------------------------------------
+#BMI Calculator Page
 elif page == "⚖️ BMI Calculator":
     st.title("⚖️ BMI Calculator")
 
@@ -162,9 +162,7 @@ elif page == "⚖️ BMI Calculator":
             else:
                 st.error("🔴 You are **Obese** — focus on diet and exercise.")
 
-# -------------------------------------
-# Area Calculator Page
-# -------------------------------------
+#Area Calculator Page
 elif page == "📐 Area Calculator":
     st.title("📐 Area Calculator")
     st.write("Compute the area of basic geometric shapes with ease.")
@@ -198,8 +196,5 @@ elif page == "📐 Area Calculator":
             area = 0.5 * base * height
             st.success(f"🔺 Area of Triangle = **{area:.2f}** sq. units")
 
-# -------------------------------------
-# Footer
-# -------------------------------------
+#Footer
 st.markdown("---")
-
