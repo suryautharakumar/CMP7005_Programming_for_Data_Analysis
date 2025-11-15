@@ -1,5 +1,3 @@
-%%writefile app.py
-
 import streamlit as st
 import math
 import time
@@ -198,3 +196,4 @@ elif page == "📐 Area Calculator":
 
 #Footer
 st.markdown("---")
+
