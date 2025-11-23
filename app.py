@@ -2,7 +2,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import folium
 from folium.plugins import MarkerCluster, HeatMap
 from streamlit_folium import st_folium
 import plotly.graph_objects as go
@@ -193,4 +192,5 @@ st.plotly_chart(fig_box, use_container_width=True)
 # ----------------------------------------------------------------------
 # END OF APP
 # ----------------------------------------------------------------------
+
 
