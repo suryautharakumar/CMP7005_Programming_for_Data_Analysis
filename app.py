@@ -19,7 +19,7 @@ st.title("🌍 Air Quality EDA Dashboard")
 @st.cache_data
 def load_data():
    df = pd.read_csv("https://raw.githubusercontent.com/suryautharakumar/CMP7005_Programming_for_Data_Analysis/main/all_cities_combined.csv",parse_dates=["Date"])
-    return df
+   return df
 
 df = load_data()
 
