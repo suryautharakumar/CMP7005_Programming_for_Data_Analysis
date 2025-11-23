@@ -18,7 +18,7 @@ st.title("🌍 Air Quality EDA Dashboard")
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("your_data.csv", parse_dates=["Date"])
+    df = pd.read_csv("raw.githubusercontent.com/suryautharakumar/CMP7005_Programming_for_Data_Analysis/refs/heads/main/all_cities_combined.csv", parse_dates=["Date"])
     return df
 
 df = load_data()
@@ -193,3 +193,4 @@ st.plotly_chart(fig_box, use_container_width=True)
 # ----------------------------------------------------------------------
 # END OF APP
 # ----------------------------------------------------------------------
+
