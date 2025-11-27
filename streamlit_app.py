@@ -35,7 +35,7 @@ st.markdown("""
             color: #ec64fc;
         }
         [data-testid="stSidebar"] {
-            background-image: url("https://i.pinimg.com/1200x/5d/06/17/5d06177eb7c29e9167204b9a337c0665.jpg");
+            background-image: url("https://img.freepik.com/free-vector/colorful-gradient-background-modern-design_361591-4063.jpg?semt=ais_hybrid&w=740&q=80");
             background-size: cover;
             background-repeat: no-repeat; 
             background-position: center; 
@@ -47,8 +47,8 @@ st.markdown("""
 st.sidebar.markdown(
     """
     <div style="display: flex; align-items: center; margin-bottom: 20px;">
-        <img src="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png" width="50" style="margin-right: 15px; border-radius:5rem;">
-        <h1 style="font-size: 1.5em; margin: 0;">Navigation Menu</h1>
+        <img src="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png" width="50" style="margin-right: 15px; border-radius:4rem;">
+        <h1 style="font-size: 1.5em; margin: 0;">Navigation</h1>
     </div>
     """,
     unsafe_allow_html=True
