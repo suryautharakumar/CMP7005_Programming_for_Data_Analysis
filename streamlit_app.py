@@ -128,8 +128,22 @@ if page == "⏳ Data Loading":
 
         st.markdown("---")
 
-        # ---------------- Missing Values per City ----------------
-        st.subheader("🏙 Missing Values per City")
+        # ---------------- TOTAL MISSING VALUES PER CITY ----------------
+        st.subheader("🏙 Total Missing Values per City")
+
+        # Calculate missing values for each city
+        city_missing_totals = df.groupby("City").apply(lambda x: x.isnull().sum().sum())
+        city_missing_totals = city_missing_totals.reset_index()
+        city_missing_totals.columns = ["City", "Total Missing Values"]
+
+        # Color formatting
+        city_total_style = city_missing_totals.style.background_gradient(cmap="Purples")
+        st.dataframe(city_total_style, use_container_width=True)
+
+        st.markdown("---")
+
+        # ---------------- Missing Values per City (Detailed) ----------------
+        st.subheader("🧩 Missing Values by Column for Each City")
 
         cities = df["City"].unique()
         selected_city = st.selectbox("Select a City to inspect missing values:", cities)
@@ -144,6 +158,7 @@ if page == "⏳ Data Loading":
         st.dataframe(city_style, use_container_width=True)
 
         st.info(f"📌 Total rows for **{selected_city}**: {len(city_df)}")
+
 
 
     # Dataset Information (df.info)
