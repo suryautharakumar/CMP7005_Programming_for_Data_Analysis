@@ -35,7 +35,7 @@ st.markdown("""
             color: #ec64fc;
         }
         [data-testid="stSidebar"] {
-            background-image: url("https://azouaoui-med.github.io/pro-sidebar-template/assets/images/sidebar-bg.jpg");
+            background-image: url("https://img.freepik.com/free-vector/simple-blue-gradient-background-vector-business_53876-166894.jpg?semt=ais_hybrid&w=740&q=80");
             background-size: cover;
             background-repeat: no-repeat; 
             background-position: center; 
