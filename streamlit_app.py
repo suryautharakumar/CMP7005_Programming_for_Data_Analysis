@@ -37,7 +37,7 @@ st.markdown("""
         .stSelectbox label, .stNumberInput label {
             font-weight: 800;
             font-weight: bold;
-            color: #ec64fc;
+            color: #06d4fc;
         }
         [data-testid="stSidebar"] {
             background-image: url("https://raw.githubusercontent.com/suryautharakumar/CMP7005_Programming_for_Data_Analysis/refs/heads/main/dl.beatsnoop.com-3000-xPqy47jcDi.jpg");
