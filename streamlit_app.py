@@ -19,7 +19,7 @@ st.markdown("""
             color: #79d125;
         }
         .stButton>button {
-            background-color: #79d125;
+            background-color: #ace177;
             color: #000000;
             border-radius: 10px;
             height: 2.8em;
@@ -30,7 +30,7 @@ st.markdown("""
             transform: scale(1);
         }
         .stButton>button:hover {
-            background-color: #06d4fc79d125;
+            background-color: #8ce3fd;
       
             transform: scale(0.9);
         }
@@ -205,13 +205,27 @@ if page == "🧹 Data Pre processing":
 
     df = st.session_state["df"]
 
-    # Create processed DF session variable if not exists
+    # -----------------------------------------------------------
+    # SESSION STATE VARIABLES
+    # -----------------------------------------------------------
     if "df_processed" not in st.session_state:
         st.session_state["df_processed"] = df.copy()
 
+    if "preprocess_msgs" not in st.session_state:
+        st.session_state["preprocess_msgs"] = []
+
+    if "show_preview" not in st.session_state:
+        st.session_state["show_preview"] = False
+
     df_processed = st.session_state["df_processed"]
 
-    st.success("Data loaded for preprocessing!")
+    # -----------------------------------------------------------
+    # DISPLAY ALL PREVIOUS SUCCESS MESSAGES
+    # -----------------------------------------------------------
+    for m in st.session_state["preprocess_msgs"]:
+        st.success(m)
+
+    st.markdown("---")
 
     # -----------------------------------------------------------
     # 1️⃣ HANDLE MISSING VALUES (WITH CONFIRM BUTTON)
@@ -233,14 +247,13 @@ if page == "🧹 Data Pre processing":
     if handle_method == "Fill ALL missing with custom value":
         custom_value = st.text_input("Enter a value to fill missing cells:")
 
-    # Only show button if user picked a method
     if handle_method != "Do Nothing":
-        if st.button("✔ Apply Missing Value Handling"):
-            temp_df = df_processed.copy()  # work copy
+        if st.button("✔ Apply"):
+            temp_df = df_processed.copy()
 
             if handle_method == "Drop rows with missing values":
                 temp_df = temp_df.dropna()
-                st.info("✔ Rows with missing values dropped.")
+                st.session_state["preprocess_msgs"].append("✔ Rows with missing values dropped.")
 
             elif handle_method == "Fill numeric (mean) & categorical (mode)":
                 num_cols = temp_df.select_dtypes(include=["float", "int"]).columns
@@ -249,38 +262,39 @@ if page == "🧹 Data Pre processing":
                 temp_df[num_cols] = temp_df[num_cols].fillna(temp_df[num_cols].mean())
                 temp_df[cat_cols] = temp_df[cat_cols].fillna(temp_df[cat_cols].mode().iloc[0])
 
-                st.info("✔ Numeric → mean | Categorical → mode.")
+                st.session_state["preprocess_msgs"].append(
+                    "✔ Numeric → mean | Categorical → mode."
+                )
 
             elif handle_method == "Fill numeric (median)":
                 num_cols = temp_df.select_dtypes(include=["float", "int"]).columns
                 temp_df[num_cols] = temp_df[num_cols].fillna(temp_df[num_cols].median())
-                st.info("✔ Numeric columns → median.")
+                st.session_state["preprocess_msgs"].append(
+                    "✔ Numeric columns → median."
+                )
 
             elif handle_method == "Fill ALL missing with custom value":
                 if custom_value != "":
                     temp_df = temp_df.fillna(custom_value)
-                    st.info(f"✔ Filled all empty cells with '{custom_value}'.")
+                    st.session_state["preprocess_msgs"].append(
+                        f"✔ Filled all empty cells with '{custom_value}'."
+                    )
                 else:
                     st.warning("⚠ Please enter a custom value!")
-                    st.stop()
 
-            # Save processed output
             st.session_state["df_processed"] = temp_df
             df_processed = temp_df
 
     st.markdown("---")
 
     # -----------------------------------------------------------
-    # 2️⃣ EXPLORE DATA DISTRIBUTIONS (MULTIPLE COLUMNS)
+    # 2️⃣ EXPLORE DATA DISTRIBUTIONS
     # -----------------------------------------------------------
     st.subheader("📊 Explore Data Distributions")
 
     numeric_cols = df_processed.select_dtypes(include=["float", "int"]).columns
 
-    selected_dist_cols = st.multiselect(
-        "Choose one or more columns:",
-        numeric_cols
-    )
+    selected_dist_cols = st.multiselect("Choose one or more columns:", numeric_cols)
 
     dist_type = st.radio(
         "Select visualization type:",
@@ -308,7 +322,7 @@ if page == "🧹 Data Pre processing":
     st.markdown("---")
 
     # -----------------------------------------------------------
-    # 3️⃣ FEATURE ENGINEERING (BUTTON CONTROLLED)
+    # 3️⃣ FEATURE ENGINEERING
     # -----------------------------------------------------------
     st.subheader("🛠 Feature Engineering")
     st.write("Click below to add **Month** and **Season** columns.")
@@ -320,11 +334,11 @@ if page == "🧹 Data Pre processing":
         temp_df["Month"] = temp_df["Date"].dt.month
 
         def map_season(month):
-            if month in [12, 1, 2]: 
+            if month in [12, 1, 2]:
                 return "Winter"
             elif month in [3, 4, 5]:
                 return "Spring"
-            elif month in [6, 7, 8]: 
+            elif month in [6, 7, 8]:
                 return "Summer"
             else:
                 return "Autumn"
@@ -334,17 +348,16 @@ if page == "🧹 Data Pre processing":
         st.session_state["df_processed"] = temp_df
         df_processed = temp_df
 
-        st.success("✔ Month and Season columns added!")
+        st.session_state["preprocess_msgs"].append(
+            "✔ Month and Season columns added!"
+        )
 
     st.markdown("---")
 
     # -----------------------------------------------------------
-    # 4️⃣ VIEW PROCESSED DATA (TOGGLE + BUTTON)
+    # 4️⃣ VIEW PROCESSED DATA
     # -----------------------------------------------------------
     st.subheader("👀 View Processed Data")
-
-    if "show_preview" not in st.session_state:
-        st.session_state["show_preview"] = False
 
     show_full = st.toggle("Show full dataset")
 
@@ -367,5 +380,3 @@ if page == "🧹 Data Pre processing":
             st.dataframe(df_processed, use_container_width=True)
         else:
             st.dataframe(df_processed.head(rows_to_show), use_container_width=True)
-
-
