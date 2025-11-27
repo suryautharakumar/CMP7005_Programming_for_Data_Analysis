@@ -35,7 +35,7 @@ st.markdown("""
             color: #ec64fc;
         }
         [data-testid="stSidebar"] {
-            background-image: url("https://img.freepik.com/free-vector/colorful-gradient-background-modern-design_361591-4583.jpg?semt=ais_incoming&w=740&q=80");
+            background-image: url("https://azouaoui-med.github.io/pro-sidebar-template/assets/images/sidebar-bg.jpg");
             background-size: cover;
             background-repeat: no-repeat; 
             background-position: center; 
