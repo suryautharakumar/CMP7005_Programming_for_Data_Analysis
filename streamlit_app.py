@@ -196,17 +196,25 @@ if page == "🧹 Data Pre processing":
 
     st.header("🧹 Data Pre-processing")
 
+    # -----------------------------------------------------------
+    # CHECK IF DATA LOADED
+    # -----------------------------------------------------------
     if "df" not in st.session_state:
         st.error("❌ Dataset not loaded. Go to '⏳ Data Loading' first.")
         st.stop()
 
     df = st.session_state["df"]
-    df_processed = df.copy()
+
+    # Create processed DF session variable if not exists
+    if "df_processed" not in st.session_state:
+        st.session_state["df_processed"] = df.copy()
+
+    df_processed = st.session_state["df_processed"]
 
     st.success("Data loaded for preprocessing!")
 
     # -----------------------------------------------------------
-    # 1️⃣ HANDLE MISSING VALUES (NOW WITH CONFIRMATION BUTTON)
+    # 1️⃣ HANDLE MISSING VALUES (WITH CONFIRM BUTTON)
     # -----------------------------------------------------------
     st.subheader("🚨 Handle Missing Values")
 
@@ -225,33 +233,40 @@ if page == "🧹 Data Pre processing":
     if handle_method == "Fill ALL missing with custom value":
         custom_value = st.text_input("Enter a value to fill missing cells:")
 
-    # 👇 SHOW BUTTON ONLY WHEN USER SELECTS SOMETHING
+    # Only show button if user picked a method
     if handle_method != "Do Nothing":
-        if st.button("✔ Apply"):
+        if st.button("✔ Apply Missing Value Handling"):
+            temp_df = df_processed.copy()  # work copy
+
             if handle_method == "Drop rows with missing values":
-                df_processed = df_processed.dropna()
+                temp_df = temp_df.dropna()
                 st.info("✔ Rows with missing values dropped.")
 
             elif handle_method == "Fill numeric (mean) & categorical (mode)":
-                num_cols = df_processed.select_dtypes(include=["float", "int"]).columns
-                cat_cols = df_processed.select_dtypes(include=["object"]).columns
+                num_cols = temp_df.select_dtypes(include=["float", "int"]).columns
+                cat_cols = temp_df.select_dtypes(include=["object"]).columns
 
-                df_processed[num_cols] = df_processed[num_cols].fillna(df_processed[num_cols].mean())
-                df_processed[cat_cols] = df_processed[cat_cols].fillna(df_processed[cat_cols].mode().iloc[0])
+                temp_df[num_cols] = temp_df[num_cols].fillna(temp_df[num_cols].mean())
+                temp_df[cat_cols] = temp_df[cat_cols].fillna(temp_df[cat_cols].mode().iloc[0])
 
                 st.info("✔ Numeric → mean | Categorical → mode.")
 
             elif handle_method == "Fill numeric (median)":
-                num_cols = df_processed.select_dtypes(include=["float", "int"]).columns
-                df_processed[num_cols] = df_processed[num_cols].fillna(df_processed[num_cols].median())
+                num_cols = temp_df.select_dtypes(include=["float", "int"]).columns
+                temp_df[num_cols] = temp_df[num_cols].fillna(temp_df[num_cols].median())
                 st.info("✔ Numeric columns → median.")
 
             elif handle_method == "Fill ALL missing with custom value":
                 if custom_value != "":
-                    df_processed = df_processed.fillna(custom_value)
-                    st.info(f"✔ All missing cells filled with '{custom_value}'.")
+                    temp_df = temp_df.fillna(custom_value)
+                    st.info(f"✔ Filled all empty cells with '{custom_value}'.")
                 else:
-                    st.warning("⚠ Enter a custom value!")
+                    st.warning("⚠ Please enter a custom value!")
+                    st.stop()
+
+            # Save processed output
+            st.session_state["df_processed"] = temp_df
+            df_processed = temp_df
 
     st.markdown("---")
 
@@ -293,58 +308,64 @@ if page == "🧹 Data Pre processing":
     st.markdown("---")
 
     # -----------------------------------------------------------
-    # 3️⃣ FEATURE ENGINEERING (MANUAL BUTTON)
+    # 3️⃣ FEATURE ENGINEERING (BUTTON CONTROLLED)
     # -----------------------------------------------------------
     st.subheader("🛠 Feature Engineering")
-    st.write("Click below run button to 'Add Month & Season'")
+    st.write("Click below to add **Month** and **Season** columns.")
 
-    if st.button("⚙ Run"):
-        df_processed["Date"] = pd.to_datetime(df_processed["Date"], errors="coerce")
-        df_processed["Month"] = df_processed["Date"].dt.month
+    if st.button("⚙ Run Feature Engineering"):
+        temp_df = df_processed.copy()
+
+        temp_df["Date"] = pd.to_datetime(temp_df["Date"], errors="coerce")
+        temp_df["Month"] = temp_df["Date"].dt.month
 
         def map_season(month):
-            if month in [12, 1, 2]: return "Winter"
-            elif month in [3, 4, 5]: return "Spring"
-            elif month in [6, 7, 8]: return "Summer"
-            else: return "Autumn"
+            if month in [12, 1, 2]: 
+                return "Winter"
+            elif month in [3, 4, 5]:
+                return "Spring"
+            elif month in [6, 7, 8]: 
+                return "Summer"
+            else:
+                return "Autumn"
 
-        df_processed["Season"] = df_processed["Month"].apply(map_season)
+        temp_df["Season"] = temp_df["Month"].apply(map_season)
+
+        st.session_state["df_processed"] = temp_df
+        df_processed = temp_df
+
         st.success("✔ Month and Season columns added!")
 
     st.markdown("---")
 
     # -----------------------------------------------------------
-    # 4️⃣ VIEW PROCESSED DATA (BUTTON + TOGGLE)
+    # 4️⃣ VIEW PROCESSED DATA (TOGGLE + BUTTON)
     # -----------------------------------------------------------
     st.subheader("👀 View Processed Data")
 
-    df_processed = st.session_state["df_processed"]
-
-    # --- SESSION STATE FIX FOR BUTTON ---
     if "show_preview" not in st.session_state:
         st.session_state["show_preview"] = False
 
     show_full = st.toggle("Show full dataset")
 
     rows_to_show = st.number_input(
-        "Number of rows to preview:",
+        "Rows to preview:",
         min_value=1,
         max_value=len(df_processed),
         value=5,
         step=1
     )
 
-    # Button updates the preview flag
     if st.button("👁 View Data"):
         st.session_state["show_preview"] = True
 
-    # Display only when triggered
     if st.session_state["show_preview"]:
         with st.spinner("⏳ Loading processed data..."):
-            time.sleep(1.9)
+            time.sleep(1.2)
 
         if show_full:
             st.dataframe(df_processed, use_container_width=True)
         else:
             st.dataframe(df_processed.head(rows_to_show), use_container_width=True)
+
 
