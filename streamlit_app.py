@@ -35,7 +35,7 @@ st.markdown("""
             color: #ec64fc;
         }
         [data-testid="stSidebar"] {
-            background-image: url("https://img.freepik.com/free-vector/colorful-gradient-background-modern-design_361591-4053.jpg");
+            background-image: url("https://img.freepik.com/premium-vector/blue-white-card-with-white-background-with-blue-logo-it_1178789-1598.jpg");
             background-size: cover;
             background-repeat: no-repeat; 
             background-position: center; 
