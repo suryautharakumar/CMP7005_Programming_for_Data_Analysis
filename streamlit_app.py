@@ -51,7 +51,7 @@ st.markdown("""
 #Sidebar
 st.sidebar.markdown(
     """
-    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+    <div style="display: flex; align-items: center;">
         <img src="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png" width="50" style="margin-right: 15px; border-radius:50%;">
         <h1 style="font-size: 1.5em; margin: 0;">Data Analysis</h1>
     </div>
@@ -60,7 +60,7 @@ st.sidebar.markdown(
 )
 st.sidebar.write("Select a feature to explore:")
 page = st.sidebar.radio(
-    "",
+    "Select a feature to explore:",
     ("⏳ Data Loading", "Data Pre processing", "Data Visualization")
 )
 st.sidebar.markdown("---")
