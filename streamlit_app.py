@@ -381,3 +381,97 @@ if page == "🧹 Data Pre processing":
             st.dataframe(df_processed, use_container_width=True)
         else:
             st.dataframe(df_processed.head(rows_to_show), use_container_width=True)
+            
+    st.markdown("---")
+    # -----------------------------------------------------------
+    # 5️⃣ SUMMARY PANEL
+    # -----------------------------------------------------------
+    st.subheader("✨ Summary Panel")
+
+    if st.button("📌 Show Summary"):
+        st.write("### 📊 Dataset Overview")
+        st.write(f"**Rows:** {df_processed.shape[0]}")
+        st.write(f"**Columns:** {df_processed.shape[1]}")
+
+        st.write("### 🧱 Column Types")
+        st.write(df_processed.dtypes)
+
+        st.write("### ❗ Missing Values")
+        st.write(df_processed.isnull().sum())
+
+        st.write("### 📈 Statistical Summary")
+        summary_option = st.selectbox(
+            "Select summary type:",
+            ["Numeric Summary", "Categorical Summary"]
+        )
+
+        if summary_option == "Numeric Summary":
+            st.write(df_processed.describe())
+        else:
+            st.write(df_processed.describe(include='object'))
+
+    st.markdown("---")
+
+    # -----------------------------------------------------------
+    # 6️⃣ CORRELATION HEATMAP
+    # -----------------------------------------------------------
+    st.subheader("📊 Correlation Heatmap (Numeric Columns Only)")
+
+    numeric_cols = df_processed.select_dtypes(include=["float", "int"])
+
+    if numeric_cols.shape[1] < 2:
+        st.info("ℹ Need at least 2 numeric columns to compute correlation.")
+    else:
+        if st.button("🔥 Show Correlation Heatmap"):
+            corr = numeric_cols.corr()
+
+            fig, ax = plt.subplots(figsize=(8, 6))
+            cax = ax.matshow(corr)
+            fig.colorbar(cax)
+
+            ax.set_xticks(range(len(corr.columns)))
+            ax.set_yticks(range(len(corr.columns)))
+            ax.set_xticklabels(corr.columns, rotation=45)
+            ax.set_yticklabels(corr.columns)
+
+            st.pyplot(fig)
+
+    st.markdown("---")
+
+    # -----------------------------------------------------------
+    # 7️⃣ OUTLIER DETECTION (IQR METHOD)
+    # -----------------------------------------------------------
+    st.subheader("🧪 Outlier Detection (IQR Method)")
+
+    numeric_columns = df_processed.select_dtypes(include=["float", "int"]).columns
+    selected_outlier_cols = st.multiselect(
+        "Select numeric columns to analyze:",
+        numeric_columns
+    )
+
+    if selected_outlier_cols:
+        if st.button("🚨 Detect Outliers"):
+            outlier_results = {}
+
+            for col in selected_outlier_cols:
+                Q1 = df_processed[col].quantile(0.25)
+                Q3 = df_processed[col].quantile(0.75)
+                IQR = Q3 - Q1
+
+                lower = Q1 - 1.5 * IQR
+                upper = Q3 + 1.5 * IQR
+
+                outliers = df_processed[
+                    (df_processed[col] < lower) | (df_processed[col] > upper)
+                ]
+
+                outlier_results[col] = len(outliers)
+
+                st.write(f"### Column: **{col}**")
+                st.write(f"Outlier count: **{len(outliers)}**")
+
+                if len(outliers) > 0:
+                    st.write("Outlier sample:")
+                    st.dataframe(outliers.head())
+
+    st.markdown("---")
