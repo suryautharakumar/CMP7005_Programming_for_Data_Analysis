@@ -69,7 +69,6 @@ st.sidebar.markdown("---")
 if page == "⏳ Data Loading":
 
     st.header("📄 Data Loading & Overview")
-    st.success("Dataset Loaded Successfully!")
 
     # Load the dataset
     @st.cache_data
@@ -86,7 +85,7 @@ if page == "⏳ Data Loading":
     col1.metric("Total Rows", f"{rows:,}")
     col2.metric("Total Columns", cols)
     col3.metric("Missing Cells", f"{df.isnull().sum().sum():,}")
-
+    st.success("Dataset Loaded Successfully!")
     st.markdown("---")
 
     # ---------------- USER ROW PREVIEW REQUEST ----------------
