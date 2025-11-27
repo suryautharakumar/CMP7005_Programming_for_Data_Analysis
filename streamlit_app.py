@@ -38,7 +38,7 @@ st.markdown("""
             background-image: url("https://media.istockphoto.com/id/481585470/vector/summer-vacation.jpg?s=2048x2048&w=is&k=20&c=O-Nz3f69lsFWfqSaBeuQA6q40qD0oEUwrSVOiaEcs1o=");
             background-size: cover;
             background-repeat: no-repeat; 
-            background-position: lift;
+            background-position: center;
         }
     </style>
 """, unsafe_allow_html=True)
