@@ -51,7 +51,7 @@ st.markdown("""
 #Sidebar
 st.sidebar.markdown(
     """
-    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+    <div style="display: flex; align-items: center; margin-bottom: 20px;">
         <img src="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png" width="50" style="margin-right: 15px; border-radius:50%;">
         <h1 style="font-size: 1.5em; margin: 0;">Data Analysis</h1>
     </div>
