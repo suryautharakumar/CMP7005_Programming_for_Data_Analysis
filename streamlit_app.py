@@ -49,14 +49,9 @@ st.markdown("""
             background-color: #ec64fc !important; /* Matches your label color */
             border-color: #ec64fc !important;
         }
-    [data-testid="stSidebar"] .stRadio label {
-        color: #ffffff !important;
-        font-weight: bold;
-    }
-
-    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label > div:first-child {
-        border-color: #ffffff !important;
-    }
+        [data-testid="stSidebar"] .stRadio label {
+            color: #ffffff !important;
+        }
     </style>
 """, unsafe_allow_html=True)
 
