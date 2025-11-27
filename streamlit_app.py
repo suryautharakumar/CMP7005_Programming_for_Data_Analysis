@@ -117,13 +117,34 @@ if page == "⏳ Data Loading":
 
     # Missing Values
     with st.expander("⚠ Missing Values Summary"):
+        st.subheader("📌 Overall Missing Values (Entire Dataset)")
+        
         missing_df = df.isnull().sum().reset_index()
         missing_df.columns = ["Column", "Missing Values"]
         missing_df["Missing %"] = round((missing_df["Missing Values"] / len(df)) * 100, 2)
-        
-        # Color formatting for readability
-        missing_df = missing_df.style.background_gradient(cmap="Oranges")
-        st.dataframe(missing_df, use_container_width=True)
+
+        overall_style = missing_df.style.background_gradient(cmap="Oranges")
+        st.dataframe(overall_style, use_container_width=True)
+
+        st.markdown("---")
+
+        # ---------------- Missing Values per City ----------------
+        st.subheader("🏙 Missing Values per City")
+
+        cities = df["City"].unique()
+        selected_city = st.selectbox("Select a City to inspect missing values:", cities)
+
+        city_df = df[df["City"] == selected_city]
+
+        city_missing = city_df.isnull().sum().reset_index()
+        city_missing.columns = ["Column", "Missing Values"]
+        city_missing["Missing %"] = round((city_missing["Missing Values"] / len(city_df)) * 100, 2)
+
+        city_style = city_missing.style.background_gradient(cmap="Blues")
+        st.dataframe(city_style, use_container_width=True)
+
+        st.info(f"📌 Total rows for **{selected_city}**: {len(city_df)}")
+
 
     # Dataset Information (df.info)
     with st.expander("ℹ Dataset Information (df.info)"):
