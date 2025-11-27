@@ -72,7 +72,7 @@ if page == "⏳ Data Loading":
     if load_btn:
         with st.spinner("Loading data..."):
             df = pd.read_csv(
-                "https://raw.githubusercontent.com/suryautharakumar/CMP7005_Programming_for_Data_Analysis/main/all_cities_combined.csv",
+                "https://raw.githubusercontent.com/suryautharakumar/CMP7005_Programming_for_Data_Analysis/refs/heads/main/all_cities_combined.csv",
                 parse_dates=["Date"]
             )
             st.success("Data Loaded Successfully!")
