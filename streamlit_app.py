@@ -56,6 +56,64 @@ st.sidebar.markdown(
 st.sidebar.write("Select a feature to explore:")
 page = st.sidebar.radio(
     "",
-    ("Data Loading", "Data Pre processing", "Data Visualization")
+    ("⏳ Data Loading", "Data Pre processing", "Data Visualization")
 )
 st.sidebar.markdown("---")
+
+
+#Data Loading Page
+if page == "⏳ Data Loading":
+
+    st.title("📥 Data Loading")
+
+    st.subheader("Load Air Quality Dataset")
+    load_btn = st.button("Load Dataset")
+
+    if load_btn:
+        with st.spinner("Loading data..."):
+            df = pd.read_csv(
+                "https://raw.githubusercontent.com/suryautharakumar/CMP7005_Programming_for_Data_Analysis/main/all_cities_combined.csv",
+                parse_dates=["Date"]
+            )
+            st.success("Data Loaded Successfully!")
+            st.write("### 🔍 Dataset Preview")
+            st.dataframe(df.head())
+
+            # BASIC INFO SECTION
+            st.markdown("---")
+            st.header("📊 Basic Information")
+
+            # Shape
+            with st.expander("📏 Dataset Shape"):
+                st.write(f"Rows: **{df.shape[0]}**, Columns: **{df.shape[1]}**")
+
+            # Column names
+            with st.expander("📋 Column Names"):
+                st.write(df.columns.tolist())
+
+            # Missing values
+            with st.expander("❗ Missing Values"):
+                missing = df.isnull().sum()
+                st.write(missing)
+
+                # Plot missing values
+                fig, ax = plt.subplots(figsize=(10, 5))
+                missing.plot(kind='bar', ax=ax)
+                ax.set_title("Missing Values per Column")
+                ax.set_ylabel("Count")
+                st.pyplot(fig)
+
+            # Info (convert df.info() to string)
+            with st.expander("ℹ️ Dataset Info"):
+                buffer = []
+                df.info(buf=buffer)
+                info_str = "\n".join(buffer)
+                st.text(info_str)
+
+            # Describe
+            with st.expander("📈 Statistical Summary"):
+                st.write(df.describe())
+
+            # Extra: unique cities
+            with st.expander("🏙️ Cities Included"):
+                st.write(df["City"].unique())
