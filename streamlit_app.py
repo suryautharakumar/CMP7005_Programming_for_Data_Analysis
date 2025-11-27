@@ -35,7 +35,7 @@ st.markdown("""
             color: #ec64fc;
         }
         [data-testid="stSidebar"] {
-            background-image: url("https://media.istockphoto.com/id/955706518/vector/tropical-beach-background.jpg?s=2048x2048&w=is&k=20&c=P-9q5ha07Kt9iMVCrDYNzSTHz4fXDQxtkULVDzbja7w=");
+            background-image: url("https://media.istockphoto.com/id/481585470/vector/summer-vacation.jpg?s=2048x2048&w=is&k=20&c=O-Nz3f69lsFWfqSaBeuQA6q40qD0oEUwrSVOiaEcs1o=");
             background-size: cover;
             background-repeat: no-repeat; 
             background-position: lift;
@@ -46,7 +46,7 @@ st.markdown("""
 #Sidebar
 st.sidebar.markdown(
     """
-    <div style="display: flex; align-items: center; margin-bottom: 20px; margin-top:10rem;">
+    <div style="display: flex; align-items: center; margin-bottom: 20px;">
         <img src="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png" width="50" style="margin-right: 15px; border-radius:50%;">
         <h1 style="font-size: 1.5em; margin: 0;">Navigation</h1>
     </div>
