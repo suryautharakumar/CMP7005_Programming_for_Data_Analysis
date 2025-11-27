@@ -35,7 +35,7 @@ st.markdown("""
             color: #ec64fc;
         }
         [data-testid="stSidebar"] {
-            background-image: url("https://media.istockphoto.com/id/481585470/vector/summer-vacation.jpg?s=2048x2048&w=is&k=20&c=O-Nz3f69lsFWfqSaBeuQA6q40qD0oEUwrSVOiaEcs1o=");
+            background-image: url("https://raw.githubusercontent.com/suryautharakumar/CMP7005_Programming_for_Data_Analysis/refs/heads/main/dl.beatsnoop.com-3000-xPqy47jcDi.jpg");
             background-size: cover;
             background-repeat: no-repeat; 
             background-position: center;
