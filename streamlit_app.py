@@ -375,7 +375,7 @@ if page == "🧹 Data Pre processing":
 
     if st.session_state["show_preview"]:
         with st.spinner("⏳ Loading processed data..."):
-            time.sleep(1)
+            time.sleep(1.8)
 
         if show_full:
             st.dataframe(df_processed, use_container_width=True)
