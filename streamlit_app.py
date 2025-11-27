@@ -62,58 +62,63 @@ st.sidebar.markdown("---")
 
 
 #Data Loading Page
+
 if page == "⏳ Data Loading":
 
-    st.title("📥 Data Loading")
+    import streamlit as st
+    import pandas as pd
+    import io
 
-    st.subheader("Load Air Quality Dataset")
-    load_btn = st.button("Load Dataset")
+    st.header("📄 Data Loading")
 
-    if load_btn:
-        with st.spinner("Loading data..."):
-            df = pd.read_csv(
-                "https://raw.githubusercontent.com/suryautharakumar/CMP7005_Programming_for_Data_Analysis/refs/heads/main/all_cities_combined.csv",
-                parse_dates=["Date"]
-            )
-            st.success("Data Loaded Successfully!")
-            st.write("### 🔍 Dataset Preview")
-            st.dataframe(df.head())
+    # Load the dataset
+    @st.cache_data
+    def load_data():
+        url = "https://raw.githubusercontent.com/suryautharakumar/CMP7005_Programming_for_Data_Analysis/main/all_cities_combined.csv"
+        df = pd.read_csv(url)
+        return df
 
-            # BASIC INFO SECTION
-            st.markdown("---")
-            st.header("📊 Basic Information")
+    df = load_data()
 
-            # Shape
-            with st.expander("📏 Dataset Shape"):
-                st.write(f"Rows: **{df.shape[0]}**, Columns: **{df.shape[1]}**")
+    st.success("Dataset Loaded Successfully!")
 
-            # Column names
-            with st.expander("📋 Column Names"):
-                st.write(df.columns.tolist())
+    # ----- Interactive Components -----
 
-            # Missing values
-            with st.expander("❗ Missing Values"):
-                missing = df.isnull().sum()
-                st.write(missing)
+    # 1) Preview dataset
+    with st.expander("🔍 Preview Dataset"):
+        st.write(df.head(10))
 
-                # Plot missing values
-                fig, ax = plt.subplots(figsize=(10, 5))
-                missing.plot(kind='bar', ax=ax)
-                ax.set_title("Missing Values per Column")
-                ax.set_ylabel("Count")
-                st.pyplot(fig)
+    # 2) Dataset Shape
+    with st.expander("📏 Dataset Shape"):
+        rows, cols = df.shape
+        st.write(f"**Rows:** {rows}")
+        st.write(f"**Columns:** {cols}")
 
-            # Info (convert df.info() to string)
-            with st.expander("ℹ️ Dataset Info"):
-                buffer = []
-                df.info(buf=buffer)
-                info_str = "\n".join(buffer)
-                st.text(info_str)
+    # 3) Column Data Types
+    with st.expander("🧬 Column Data Types"):
+        st.write(df.dtypes)
 
-            # Describe
-            with st.expander("📈 Statistical Summary"):
-                st.write(df.describe())
+    # 4) Missing Values
+    with st.expander("⚠ Missing Values Summary"):
+        missing_df = df.isnull().sum().reset_index()
+        missing_df.columns = ["Column", "Missing Values"]
+        missing_df["Missing %"] = round((missing_df["Missing Values"] / len(df)) * 100, 2)
+        st.dataframe(missing_df)
 
-            # Extra: unique cities
-            with st.expander("🏙️ Cities Included"):
-                st.write(df["City"].unique())
+    # 5) Info-like output
+    with st.expander("ℹ Dataset Information"):
+        buffer = io.StringIO()
+        df.info(buf=buffer)
+        s = buffer.getvalue()
+        st.text(s)
+
+    # 6) Basic Statistics
+    with st.expander("📊 Basic Statistical Summary"):
+        st.write(df.describe(include="all"))
+        
+    # 7) Unique values per categorical column
+    with st.expander("🔠 Unique Values in Categorical Columns"):
+        cat_cols = df.select_dtypes(include="object").columns
+        for col in cat_cols:
+            st.write(f"**{col}**: {df[col].nunique()} unique values")
+            st.write(df[col].unique())
