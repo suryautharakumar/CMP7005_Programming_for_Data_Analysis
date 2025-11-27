@@ -53,7 +53,7 @@ st.sidebar.markdown(
     """
     <div style="display: flex; align-items: center; margin-bottom:10px">
         <img src="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png" width="50" style="margin-right: 15px; border-radius:50%;">
-        <h1 style="font-size: 1.3em; margin: 0;">Navigation Bar</h1>
+        <h1 style="font-size: 1.2em; margin: 0;">Navigation Bar</h1>
     </div>
     """,
     unsafe_allow_html=True
@@ -61,7 +61,7 @@ st.sidebar.markdown(
 st.sidebar.write("📈 Air Quality Data Analysis")
 page = st.sidebar.radio(
     "Select a feature to explore:",
-    ("⏳ Data Loading", "Data Pre processing", "Data Visualization")
+    ("⏳ Data Loading", "Data Preprocessing", "Data Visualization")
 )
 st.sidebar.markdown("---")
 
@@ -107,9 +107,11 @@ if page == "⏳ Data Loading":
     with preview_col2:
         st.write(f"📌 **Total Rows Available:** {rows}")
 
-    st.dataframe(df.head(num_rows), use_container_width=True)
+    with st.spinner("Loading preview..."):
+        st.dataframe(df.head(num_rows), use_container_width=True)
 
     st.markdown("---")
+
 
     # ----------------- EXPANDERS -------------------
 
