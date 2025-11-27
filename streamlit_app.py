@@ -41,9 +41,15 @@ st.markdown("""
             background-position: center; 
             color:#ffffff;
         }
-    label[data-baseweb="radio"] span {
-        color: #ffffff !important; /* Your desired color */
-    }
+
+        label[data-baseweb="radio"] span {
+            color: #ffffff !important; 
+        }
+        input[type="radio"]:checked + label div:first-child {
+            background-color: #ec64fc !important; /* Matches your label color */
+            border-color: #ec64fc !important;
+        }
+
     </style>
 """, unsafe_allow_html=True)
 
