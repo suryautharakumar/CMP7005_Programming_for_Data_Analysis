@@ -2,7 +2,7 @@ import streamlit as st
 import math
 import time
 
-st.set_page_config(page_title="Multi App | Cardiff Metropolitan University", page_icon="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png", layout="centered")
+st.set_page_config(page_title="All Cities Air Quality Data Analysis | Cardiff Metropolitan University", page_icon="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png", layout="centered")
 
 #header css styling
 st.markdown("""
@@ -49,7 +49,14 @@ st.markdown("""
             background-color: #ec64fc !important; /* Matches your label color */
             border-color: #ec64fc !important;
         }
+    [data-testid="stSidebar"] .stRadio label {
+        color: #ffffff !important;
+        font-weight: bold;
+    }
 
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label > div:first-child {
+        border-color: #ffffff !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -66,6 +73,6 @@ st.sidebar.markdown(
 st.sidebar.write("Select a feature to explore:")
 page = st.sidebar.radio(
     "",
-    ("🏗️ Calculator", "⚖️ BMI Calculator", "📐 Area Calculator")
+    ("Data Loading", "Data Pre processing", "Data Visualization")
 )
 st.sidebar.markdown("---")
