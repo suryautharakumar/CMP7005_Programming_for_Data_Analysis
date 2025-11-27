@@ -69,7 +69,7 @@ st.sidebar.markdown("---")
 if page == "⏳ Data Loading":
 
     st.header("📄 Data Loading & Overview")
-    st.write("Explore your dataset interactively.")
+    st.success("Dataset Loaded Successfully!")
 
     # Load the dataset
     @st.cache_data
