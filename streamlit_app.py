@@ -201,12 +201,12 @@ if page == "🧹 Data Pre processing":
         st.stop()
 
     df = st.session_state["df"]
-    df_processed = df.copy()  
+    df_processed = df.copy()
 
     st.success("Data loaded for preprocessing!")
 
     # -----------------------------------------------------------
-    # 1️⃣ HANDLE MISSING VALUES
+    # 1️⃣ HANDLE MISSING VALUES (NOW WITH CONFIRMATION BUTTON)
     # -----------------------------------------------------------
     st.subheader("🚨 Handle Missing Values")
 
@@ -221,42 +221,49 @@ if page == "🧹 Data Pre processing":
         ]
     )
 
-    if handle_method == "Drop rows with missing values":
-        df_processed = df_processed.dropna()
-        st.info("✔ Rows with missing values dropped.")
-
-    elif handle_method == "Fill numeric (mean) & categorical (mode)":
-        num_cols = df_processed.select_dtypes(include=["float", "int"]).columns
-        cat_cols = df_processed.select_dtypes(include=["object"]).columns
-
-        df_processed[num_cols] = df_processed[num_cols].fillna(df_processed[num_cols].mean())
-        df_processed[cat_cols] = df_processed[cat_cols].fillna(df_processed[cat_cols].mode().iloc[0])
-
-        st.info("✔ Numeric filled with **mean**, categorical filled with **mode**.")
-
-    elif handle_method == "Fill numeric (median)":
-        num_cols = df_processed.select_dtypes(include=["float", "int"]).columns
-        df_processed[num_cols] = df_processed[num_cols].fillna(df_processed[num_cols].median())
-        st.info("✔ Numeric columns filled with **median**.")
-
-    elif handle_method == "Fill ALL missing with custom value":
+    custom_value = None
+    if handle_method == "Fill ALL missing with custom value":
         custom_value = st.text_input("Enter a value to fill missing cells:")
-        if custom_value != "":
-            df_processed = df_processed.fillna(custom_value)
-            st.info(f"✔ All missing cells filled with **{custom_value}**.")
+
+    # 👇 SHOW BUTTON ONLY WHEN USER SELECTS SOMETHING
+    if handle_method != "Do Nothing":
+        if st.button("✔ Apply Missing Value Handling"):
+            if handle_method == "Drop rows with missing values":
+                df_processed = df_processed.dropna()
+                st.info("✔ Rows with missing values dropped.")
+
+            elif handle_method == "Fill numeric (mean) & categorical (mode)":
+                num_cols = df_processed.select_dtypes(include=["float", "int"]).columns
+                cat_cols = df_processed.select_dtypes(include=["object"]).columns
+
+                df_processed[num_cols] = df_processed[num_cols].fillna(df_processed[num_cols].mean())
+                df_processed[cat_cols] = df_processed[cat_cols].fillna(df_processed[cat_cols].mode().iloc[0])
+
+                st.info("✔ Numeric → mean | Categorical → mode.")
+
+            elif handle_method == "Fill numeric (median)":
+                num_cols = df_processed.select_dtypes(include=["float", "int"]).columns
+                df_processed[num_cols] = df_processed[num_cols].fillna(df_processed[num_cols].median())
+                st.info("✔ Numeric columns → median.")
+
+            elif handle_method == "Fill ALL missing with custom value":
+                if custom_value != "":
+                    df_processed = df_processed.fillna(custom_value)
+                    st.info(f"✔ All missing cells filled with '{custom_value}'.")
+                else:
+                    st.warning("⚠ Enter a custom value!")
 
     st.markdown("---")
 
-
     # -----------------------------------------------------------
-    # 2️⃣ EXPLORE DATA DISTRIBUTIONS
+    # 2️⃣ EXPLORE DATA DISTRIBUTIONS (MULTIPLE COLUMNS)
     # -----------------------------------------------------------
     st.subheader("📊 Explore Data Distributions")
 
     numeric_cols = df_processed.select_dtypes(include=["float", "int"]).columns
 
-    selected_dist_col = st.selectbox(
-        "Choose a column to visualize distribution:",
+    selected_dist_cols = st.multiselect(
+        "Choose one or more columns:",
         numeric_cols
     )
 
@@ -266,76 +273,67 @@ if page == "🧹 Data Pre processing":
         horizontal=True
     )
 
-    # Plot
     import matplotlib.pyplot as plt
 
-    fig, ax = plt.subplots()
+    if selected_dist_cols:
+        for col in selected_dist_cols:
+            st.write(f"### 📌 {col}")
 
-    if dist_type == "Histogram":
-        ax.hist(df_processed[selected_dist_col].dropna(), bins=40)
-        ax.set_title(f"Histogram - {selected_dist_col}")
-    else:
-        ax.boxplot(df_processed[selected_dist_col].dropna())
-        ax.set_title(f"Boxplot - {selected_dist_col}")
+            fig, ax = plt.subplots()
 
-    st.pyplot(fig)
+            if dist_type == "Histogram":
+                ax.hist(df_processed[col].dropna(), bins=40)
+                ax.set_title(f"Histogram - {col}")
+            else:
+                ax.boxplot(df_processed[col].dropna())
+                ax.set_title(f"Boxplot - {col}")
+
+            st.pyplot(fig)
 
     st.markdown("---")
 
-
     # -----------------------------------------------------------
-    # 3️⃣ FEATURE ENGINEERING
+    # 3️⃣ FEATURE ENGINEERING (MANUAL BUTTON)
     # -----------------------------------------------------------
     st.subheader("🛠 Feature Engineering")
 
-    # Convert Date column
-    df_processed["Date"] = pd.to_datetime(df_processed["Date"], errors="coerce")
+    if st.button("⚙ Run Feature Engineering"):
+        df_processed["Date"] = pd.to_datetime(df_processed["Date"], errors="coerce")
+        df_processed["Month"] = df_processed["Date"].dt.month
 
-    # Month column
-    df_processed["Month"] = df_processed["Date"].dt.month
+        def map_season(month):
+            if month in [12, 1, 2]: return "Winter"
+            elif month in [3, 4, 5]: return "Spring"
+            elif month in [6, 7, 8]: return "Summer"
+            else: return "Autumn"
 
-    # Season column
-    def map_season(month):
-        if month in [12, 1, 2]:
-            return "Winter"
-        elif month in [3, 4, 5]:
-            return "Spring"
-        elif month in [6, 7, 8]:
-            return "Summer"
-        else:
-            return "Autumn"
-
-    df_processed["Season"] = df_processed["Month"].apply(map_season)
-
-    st.success("✔ Month and Season columns added!")
+        df_processed["Season"] = df_processed["Month"].apply(map_season)
+        st.success("✔ Month and Season columns added!")
 
     st.markdown("---")
 
-
     # -----------------------------------------------------------
-    # 4️⃣ PREVIEW PROCESSED DATA (with spinner)
+    # 4️⃣ VIEW PROCESSED DATA (BUTTON + TOGGLE)
     # -----------------------------------------------------------
     st.subheader("👀 View Processed Data")
 
-    prev_col1, prev_col2 = st.columns([2, 1])
+    show_full = st.toggle("Show full dataset")
 
-    with prev_col1:
-        rows_to_show = st.number_input(
-            "Enter number of rows to preview:",
-            min_value=1,
-            max_value=len(df_processed),
-            value=5,
-            step=1
-        )
+    rows_to_show = st.number_input(
+        "Number of rows to preview:",
+        min_value=1,
+        max_value=len(df_processed),
+        value=5,
+        step=1
+    )
 
-    with prev_col2:
-        st.write(f"📌 **Total Rows Available:** {len(df_processed)}")
+    if st.button("👁 Preview Data"):
+        with st.spinner("⏳ Loading processed data..."):
+            time.sleep(1)
 
-    with st.spinner("⏳ Loading processed data..."):
-        time.sleep(1.5)
-
-    st.dataframe(df_processed.head(rows_to_show), use_container_width=True)
-
-    st.markdown("---")
+        if show_full:
+            st.dataframe(df_processed, use_container_width=True)
+        else:
+            st.dataframe(df_processed.head(rows_to_show), use_container_width=True)
 
     st.success("🎉 Data Preprocessing Completed!")
