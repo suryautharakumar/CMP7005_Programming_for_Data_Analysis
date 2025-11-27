@@ -47,7 +47,7 @@ st.markdown("""
 st.sidebar.markdown(
     """
     <div style="display: flex; align-items: center; margin-bottom: 20px;">
-        <img src="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png" width="50" style="margin-right: 15px; border-radius:5rem;">
+        <img src="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png" width="50" style="margin-right: 15px; border-radius:6rem;">
         <h1 style="font-size: 1.5em; margin: 0;">Navigation</h1>
     </div>
     """,
