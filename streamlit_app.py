@@ -333,13 +333,13 @@ if page == "🧹 Data Pre processing":
     )
 
     # Button updates the preview flag
-    if st.button("👁 Preview Data"):
+    if st.button("👁 View Data"):
         st.session_state["show_preview"] = True
 
     # Display only when triggered
     if st.session_state["show_preview"]:
         with st.spinner("⏳ Loading processed data..."):
-            time.sleep(1)
+            time.sleep(1.9)
 
         if show_full:
             st.dataframe(df_processed, use_container_width=True)
