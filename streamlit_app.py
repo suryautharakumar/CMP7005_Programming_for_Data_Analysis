@@ -35,7 +35,7 @@ st.markdown("""
             transform: scale(0.9);
         }
         .stSelectbox label, .stNumberInput label {
-            font-weight: 800;
+            font-weight: 900;
             font-weight: bold;
             color: #79d125;
         }
