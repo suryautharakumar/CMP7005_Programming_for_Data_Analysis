@@ -242,7 +242,7 @@ if page == "🧹 Data Pre processing":
 
     # Only show "Apply" if method selected
     if handle_method != "Do Nothing":
-        if st.button("✔ Apply Missing Value Handling"):
+        if st.button("✔ Apply"):
             temp_df = df_processed.copy()
 
             if handle_method == "Drop rows with missing values":
