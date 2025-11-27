@@ -19,7 +19,7 @@ st.markdown("""
             color: #79d125;
         }
         .stButton>button {
-            background-color: #06d4fc;
+            background-color: #79d125;
             color: #000000;
             border-radius: 10px;
             height: 2.8em;
@@ -30,7 +30,7 @@ st.markdown("""
             transform: scale(1);
         }
         .stButton>button:hover {
-            background-color: #79d125;
+            background-color: #06d4fc79d125;
       
             transform: scale(0.9);
         }
@@ -227,7 +227,7 @@ if page == "🧹 Data Pre processing":
 
     # 👇 SHOW BUTTON ONLY WHEN USER SELECTS SOMETHING
     if handle_method != "Do Nothing":
-        if st.button("✔ Apply Missing Value Handling"):
+        if st.button("✔ Apply"):
             if handle_method == "Drop rows with missing values":
                 df_processed = df_processed.dropna()
                 st.info("✔ Rows with missing values dropped.")
@@ -296,8 +296,9 @@ if page == "🧹 Data Pre processing":
     # 3️⃣ FEATURE ENGINEERING (MANUAL BUTTON)
     # -----------------------------------------------------------
     st.subheader("🛠 Feature Engineering")
+    st.write("Click below run button to 'Add Month & Season'")
 
-    if st.button("⚙ Run Feature Engineering"):
+    if st.button("⚙ Run"):
         df_processed["Date"] = pd.to_datetime(df_processed["Date"], errors="coerce")
         df_processed["Month"] = df_processed["Date"].dt.month
 
@@ -317,6 +318,10 @@ if page == "🧹 Data Pre processing":
     # -----------------------------------------------------------
     st.subheader("👀 View Processed Data")
 
+    # --- SESSION STATE FIX FOR BUTTON ---
+    if "show_preview" not in st.session_state:
+        st.session_state["show_preview"] = False
+
     show_full = st.toggle("Show full dataset")
 
     rows_to_show = st.number_input(
@@ -327,7 +332,12 @@ if page == "🧹 Data Pre processing":
         step=1
     )
 
+    # Button updates the preview flag
     if st.button("👁 Preview Data"):
+        st.session_state["show_preview"] = True
+
+    # Display only when triggered
+    if st.session_state["show_preview"]:
         with st.spinner("⏳ Loading processed data..."):
             time.sleep(1)
 
@@ -336,4 +346,3 @@ if page == "🧹 Data Pre processing":
         else:
             st.dataframe(df_processed.head(rows_to_show), use_container_width=True)
 
-    st.success("🎉 Data Preprocessing Completed!")
