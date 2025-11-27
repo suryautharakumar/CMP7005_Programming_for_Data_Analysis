@@ -313,6 +313,10 @@ if page == "🧹 Data Pre processing":
 
     st.markdown("---")
 
+    # Basic Statistics
+    with st.expander("📊 Statistical Summary"):
+        st.dataframe(df.describe(include="all"), use_container_width=True)
+
     # -----------------------------------------------------------
     # 4️⃣ VIEW PROCESSED DATA (BUTTON + TOGGLE)
     # -----------------------------------------------------------
