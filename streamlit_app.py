@@ -211,24 +211,17 @@ if page == "🧹 Data Pre processing":
     if "df_processed" not in st.session_state:
         st.session_state["df_processed"] = df.copy()
 
-    if "preprocess_msgs" not in st.session_state:
-        st.session_state["preprocess_msgs"] = []
+    # Separate message holders by section
+    if "msg_missing" not in st.session_state:
+        st.session_state["msg_missing"] = []
 
-    if "show_preview" not in st.session_state:
-        st.session_state["show_preview"] = False
+    if "msg_feature" not in st.session_state:
+        st.session_state["msg_feature"] = []
 
     df_processed = st.session_state["df_processed"]
 
     # -----------------------------------------------------------
-    # DISPLAY ALL PREVIOUS SUCCESS MESSAGES
-    # -----------------------------------------------------------
-    for m in st.session_state["preprocess_msgs"]:
-        st.success(m)
-
-    st.markdown("---")
-
-    # -----------------------------------------------------------
-    # 1️⃣ HANDLE MISSING VALUES (WITH CONFIRM BUTTON)
+    # 1️⃣ HANDLE MISSING VALUES
     # -----------------------------------------------------------
     st.subheader("🚨 Handle Missing Values")
 
@@ -248,42 +241,41 @@ if page == "🧹 Data Pre processing":
         custom_value = st.text_input("Enter a value to fill missing cells:")
 
     if handle_method != "Do Nothing":
-        if st.button("✔ Apply"):
+        if st.button("✔ Apply Missing Value Handling"):
             temp_df = df_processed.copy()
 
+            # PROCESSING OPTIONS
             if handle_method == "Drop rows with missing values":
                 temp_df = temp_df.dropna()
-                st.session_state["preprocess_msgs"].append("✔ Rows with missing values dropped.")
+                st.session_state["msg_missing"].append("✔ Rows with missing values dropped.")
 
             elif handle_method == "Fill numeric (mean) & categorical (mode)":
                 num_cols = temp_df.select_dtypes(include=["float", "int"]).columns
                 cat_cols = temp_df.select_dtypes(include=["object"]).columns
-
                 temp_df[num_cols] = temp_df[num_cols].fillna(temp_df[num_cols].mean())
                 temp_df[cat_cols] = temp_df[cat_cols].fillna(temp_df[cat_cols].mode().iloc[0])
-
-                st.session_state["preprocess_msgs"].append(
-                    "✔ Numeric → mean | Categorical → mode."
-                )
+                st.session_state["msg_missing"].append("✔ Numeric → mean | Categorical → mode.")
 
             elif handle_method == "Fill numeric (median)":
                 num_cols = temp_df.select_dtypes(include=["float", "int"]).columns
                 temp_df[num_cols] = temp_df[num_cols].fillna(temp_df[num_cols].median())
-                st.session_state["preprocess_msgs"].append(
-                    "✔ Numeric columns → median."
-                )
+                st.session_state["msg_missing"].append("✔ Numeric columns → median.")
 
             elif handle_method == "Fill ALL missing with custom value":
                 if custom_value != "":
                     temp_df = temp_df.fillna(custom_value)
-                    st.session_state["preprocess_msgs"].append(
-                        f"✔ Filled all empty cells with '{custom_value}'."
+                    st.session_state["msg_missing"].append(
+                        f"✔ Filled all missing cells with '{custom_value}'."
                     )
                 else:
                     st.warning("⚠ Please enter a custom value!")
 
             st.session_state["df_processed"] = temp_df
             df_processed = temp_df
+
+    # SHOW MESSAGES RIGHT BELOW THIS SECTION
+    for m in st.session_state["msg_missing"]:
+        st.success(m)
 
     st.markdown("---")
 
@@ -307,15 +299,12 @@ if page == "🧹 Data Pre processing":
     if selected_dist_cols:
         for col in selected_dist_cols:
             st.write(f"### 📌 {col}")
-
             fig, ax = plt.subplots()
 
             if dist_type == "Histogram":
                 ax.hist(df_processed[col].dropna(), bins=40)
-                ax.set_title(f"Histogram - {col}")
             else:
                 ax.boxplot(df_processed[col].dropna())
-                ax.set_title(f"Boxplot - {col}")
 
             st.pyplot(fig)
 
@@ -325,7 +314,7 @@ if page == "🧹 Data Pre processing":
     # 3️⃣ FEATURE ENGINEERING
     # -----------------------------------------------------------
     st.subheader("🛠 Feature Engineering")
-    st.write("Click below to add **Month** and **Season** columns.")
+    st.write("Click the button to add Month and Season columns.")
 
     if st.button("⚙ Run Feature Engineering"):
         temp_df = df_processed.copy()
@@ -348,9 +337,11 @@ if page == "🧹 Data Pre processing":
         st.session_state["df_processed"] = temp_df
         df_processed = temp_df
 
-        st.session_state["preprocess_msgs"].append(
-            "✔ Month and Season columns added!"
-        )
+        st.session_state["msg_feature"].append("✔ Month & Season added successfully!")
+
+    # SHOW FEATURE ENGINEERING MESSAGES RIGHT HERE
+    for m in st.session_state["msg_feature"]:
+        st.success(m)
 
     st.markdown("---")
 
@@ -358,6 +349,9 @@ if page == "🧹 Data Pre processing":
     # 4️⃣ VIEW PROCESSED DATA
     # -----------------------------------------------------------
     st.subheader("👀 View Processed Data")
+
+    if "show_preview" not in st.session_state:
+        st.session_state["show_preview"] = False
 
     show_full = st.toggle("Show full dataset")
 
@@ -374,7 +368,7 @@ if page == "🧹 Data Pre processing":
 
     if st.session_state["show_preview"]:
         with st.spinner("⏳ Loading processed data..."):
-            time.sleep(1.2)
+            time.sleep(1)
 
         if show_full:
             st.dataframe(df_processed, use_container_width=True)
