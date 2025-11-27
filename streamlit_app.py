@@ -38,19 +38,7 @@ st.markdown("""
             background-image: url("https://media.istockphoto.com/id/1498900056/vector/abstract-hand-painted-beach-themed-watercolour-background.jpg?s=2048x2048&w=is&k=20&c=KZqrxJYxcizDDOKXFVeirLOLdqjr0PXWqqsGDbfr3gY=");
             background-size: cover;
             background-repeat: no-repeat; 
-            background-position: center; 
-            color:#ffffff;
-        }
-
-        label[data-baseweb="radio"] span {
-            color: #ffffff !important; 
-        }
-        input[type="radio"]:checked + label div:first-child {
-            background-color: #ec64fc !important; /* Matches your label color */
-            border-color: #ec64fc !important;
-        }
-        [data-testid="stSidebar"] .stRadio label {
-            color: #ffffff !important;
+            background-position: right;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -60,7 +48,7 @@ st.sidebar.markdown(
     """
     <div style="display: flex; align-items: center; margin-bottom: 20px;">
         <img src="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png" width="50" style="margin-right: 15px; border-radius:50%;">
-        <h1 style="font-size: 1.5em; margin: 0; color:#ffffff">Navigation</h1>
+        <h1 style="font-size: 1.5em; margin: 0;">Navigation</h1>
     </div>
     """,
     unsafe_allow_html=True
