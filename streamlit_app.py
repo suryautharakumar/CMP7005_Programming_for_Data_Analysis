@@ -35,7 +35,7 @@ st.markdown("""
             color: #ec64fc;
         }
         [data-testid="stSidebar"] {
-            background-image: url("https://media.istockphoto.com/id/1397232283/vector/cloudscape-background.jpg?s=2048x2048&w=is&k=20&c=bFMMrSfrisa_iz-QXnp9wunS5WudCsSFTE5lhgegv-c=");
+            background-image: url("https://media.istockphoto.com/id/2195341449/vector/stipple-illustration-of-cumulus-clouds.jpg?s=2048x2048&w=is&k=20&c=YP9oQvKZHRDXO-sb5GTlpentGF9rE1RZV7av-ILDqoA=");
             background-size: cover;
             background-repeat: no-repeat; 
             background-position: lift;
