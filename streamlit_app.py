@@ -107,11 +107,12 @@ if page == "⏳ Data Loading":
     with preview_col2:
         st.write(f"📌 **Total Rows Available:** {rows}")
 
-    with st.spinner("Loading preview..."):
-        st.dataframe(df.head(num_rows), use_container_width=True)
+    with st.spinner("⏳ Loading preview..."):
+        time.sleep(1.8)
+
+    st.dataframe(df.head(num_rows), use_container_width=True)
 
     st.markdown("---")
-
 
     # ----------------- EXPANDERS -------------------
 
