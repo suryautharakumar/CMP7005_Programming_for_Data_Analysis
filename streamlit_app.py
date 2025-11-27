@@ -53,12 +53,12 @@ st.sidebar.markdown(
     """
     <div style="display: flex; align-items: center; margin-bottom:10px">
         <img src="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png" width="50" style="margin-right: 15px; border-radius:50%;">
-        <h1 style="font-size: 1.5em; margin: 0;">Navigation Bar</h1>
+        <h1 style="font-size: 1.2em; margin: 0;">Navigation Bar</h1>
     </div>
     """,
     unsafe_allow_html=True
 )
-st.sidebar.write("Air Quality Data Analysis")
+st.sidebar.write("📈 Air Quality Data Analysis")
 page = st.sidebar.radio(
     "Select a feature to explore:",
     ("⏳ Data Loading", "Data Pre processing", "Data Visualization")
