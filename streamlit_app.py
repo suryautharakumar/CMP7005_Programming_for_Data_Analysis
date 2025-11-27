@@ -35,7 +35,7 @@ st.markdown("""
             color: #ec64fc;
         }
         [data-testid="stSidebar"] {
-            background-image: url("https://img2.wallspic.com/crops/6/3/7/9/6/169736/169736-smartphone-drawing-android-painting-art-1500x3000.png");
+            background-image: url("https://media.istockphoto.com/id/1498900056/vector/abstract-hand-painted-beach-themed-watercolour-background.jpg?s=2048x2048&w=is&k=20&c=KZqrxJYxcizDDOKXFVeirLOLdqjr0PXWqqsGDbfr3gY=");
             background-size: cover;
             background-repeat: no-repeat; 
             background-position: center; 
@@ -60,7 +60,7 @@ st.sidebar.markdown(
     """
     <div style="display: flex; align-items: center; margin-bottom: 20px;">
         <img src="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png" width="50" style="margin-right: 15px; border-radius:50%;">
-        <h1 style="font-size: 1.5em; margin: 0; color:#ffffff">Navigation Menu</h1>
+        <h1 style="font-size: 1.5em; margin: 0; color:#ffffff">Navigation</h1>
     </div>
     """,
     unsafe_allow_html=True
