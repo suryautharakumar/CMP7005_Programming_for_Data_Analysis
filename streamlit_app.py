@@ -35,7 +35,7 @@ st.markdown("""
             color: #ec64fc;
         }
         [data-testid="stSidebar"] {
-            background-image: url("https://media.istockphoto.com/id/2218628901/photo/palm-tree-standing-tall-against-a-clear-blue-sky.jpg?s=2048x2048&w=is&k=20&c=EQCiHp5HpaXbd1EcFGggKCiRWAZVyt9fMjUy8IpVynw=");
+            background-image: url("https://media.istockphoto.com/id/955706518/vector/tropical-beach-background.jpg?s=2048x2048&w=is&k=20&c=P-9q5ha07Kt9iMVCrDYNzSTHz4fXDQxtkULVDzbja7w=");
             background-size: cover;
             background-repeat: no-repeat; 
             background-position: lift;
