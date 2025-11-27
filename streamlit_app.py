@@ -4,6 +4,8 @@ import time
 import pandas as pd
 import io
 
+# 79d125 - green
+# 06d4fc - blue
 
 st.set_page_config(page_title="All Cities Air Quality Data Analysis | Cardiff Metropolitan University", page_icon="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png", layout="centered")
 
@@ -14,10 +16,10 @@ st.markdown("""
             background-color: #f8fafc;
         }
         h1, h2, h3 {
-            color: #b2e5f8;
+            color: #79d125;
         }
         .stButton>button {
-            background-color: #eabbf1;
+            background-color: #06d4fc;
             color: #000000;
             border-radius: 10px;
             height: 2.8em;
@@ -28,7 +30,7 @@ st.markdown("""
             transform: scale(1);
         }
         .stButton>button:hover {
-            background-color: #b2e5f8;
+            background-color: #79d125;
       
             transform: scale(0.9);
         }
