@@ -80,6 +80,10 @@ if page == "⏳ Data Loading":
         return df
 
     df = load_data()
+
+    #Saving dataset for global use
+    st.session_state["df"] = df
+
     rows, cols = df.shape
 
     # Top Summary Metrics (Attractive Cards)
@@ -185,12 +189,19 @@ if page == "⏳ Data Loading":
             st.write(f"🟣 Unique Values: **{df[col].nunique()}**")
             st.write(df[col].unique())
             st.markdown("---")
+            
+# Data Pre Processing
 
 if page == "🧹 Data Pre processing":
 
     st.header("🧹 Data Pre-processing")
 
-    df_processed = df.copy()  # work on a fresh copy
+    if "df" not in st.session_state:
+        st.error("❌ Dataset not loaded. Go to '⏳ Data Loading' first.")
+        st.stop()
+
+    df = st.session_state["df"]
+    df_processed = df.copy()  
 
     st.success("Data loaded for preprocessing!")
 
