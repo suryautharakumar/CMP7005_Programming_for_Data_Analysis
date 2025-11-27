@@ -35,7 +35,7 @@ st.markdown("""
             color: #ec64fc;
         }
         [data-testid="stSidebar"] {
-            background-image: url("https://media.istockphoto.com/id/1498900056/vector/abstract-hand-painted-beach-themed-watercolour-background.jpg?s=2048x2048&w=is&k=20&c=KZqrxJYxcizDDOKXFVeirLOLdqjr0PXWqqsGDbfr3gY=");
+            background-image: url("https://media.istockphoto.com/id/2195341449/vector/stipple-illustration-of-cumulus-clouds.jpg?s=2048x2048&w=is&k=20&c=YP9oQvKZHRDXO-sb5GTlpentGF9rE1RZV7av-ILDqoA=");
             background-size: cover;
             background-repeat: no-repeat; 
             background-position: lift;
