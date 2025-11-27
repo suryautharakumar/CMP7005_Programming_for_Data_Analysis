@@ -38,7 +38,7 @@ st.markdown("""
             background-image: url("https://media.istockphoto.com/id/1498900056/vector/abstract-hand-painted-beach-themed-watercolour-background.jpg?s=2048x2048&w=is&k=20&c=KZqrxJYxcizDDOKXFVeirLOLdqjr0PXWqqsGDbfr3gY=");
             background-size: cover;
             background-repeat: no-repeat; 
-            background-position: right;
+            background-position: lift;
         }
     </style>
 """, unsafe_allow_html=True)
