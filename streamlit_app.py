@@ -1,6 +1,9 @@
 import streamlit as st
 import math
 import time
+import pandas as pd
+import io
+
 
 st.set_page_config(page_title="All Cities Air Quality Data Analysis | Cardiff Metropolitan University", page_icon="https://www.cardiffmet.ac.uk/media/cardiff-met/site-assets/images/apple-touch-icon.png", layout="centered")
 
@@ -65,11 +68,8 @@ st.sidebar.markdown("---")
 
 if page == "⏳ Data Loading":
 
-    import streamlit as st
-    import pandas as pd
-    import io
-
-    st.header("📄 Data Loading")
+    st.header("📄 Data Loading & Overview")
+    st.write("Explore your dataset interactively.")
 
     # Load the dataset
     @st.cache_data
@@ -79,46 +79,69 @@ if page == "⏳ Data Loading":
         return df
 
     df = load_data()
+    rows, cols = df.shape
 
-    st.success("Dataset Loaded Successfully!")
+    # Top Summary Metrics (Attractive Cards)
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Total Rows", f"{rows:,}")
+    col2.metric("Total Columns", cols)
+    col3.metric("Missing Cells", f"{df.isnull().sum().sum():,}")
 
-    # ----- Interactive Components -----
+    st.markdown("---")
 
-    # 1) Preview dataset
-    with st.expander("🔍 Preview Dataset"):
-        st.write(df.head(10))
+    # ---------------- USER ROW PREVIEW REQUEST ----------------
+    st.subheader("🔍 Preview Dataset")
 
-    # 2) Dataset Shape
-    with st.expander("📏 Dataset Shape"):
-        rows, cols = df.shape
-        st.write(f"**Rows:** {rows}")
-        st.write(f"**Columns:** {cols}")
+    preview_col1, preview_col2 = st.columns([2, 1])
 
-    # 3) Column Data Types
+    with preview_col1:
+        num_rows = st.number_input(
+            "Enter number of rows to preview:",
+            min_value=1,
+            max_value=rows,
+            value=5,
+            step=1,
+        )
+
+    with preview_col2:
+        st.write(f"📌 **Total Rows Available:** {rows}")
+
+    st.dataframe(df.head(num_rows), use_container_width=True)
+
+    st.markdown("---")
+
+    # ----------------- EXPANDERS -------------------
+
+    # Column Data Types
     with st.expander("🧬 Column Data Types"):
-        st.write(df.dtypes)
+        st.dataframe(df.dtypes.to_frame("Data Type"))
 
-    # 4) Missing Values
+    # Missing Values
     with st.expander("⚠ Missing Values Summary"):
         missing_df = df.isnull().sum().reset_index()
         missing_df.columns = ["Column", "Missing Values"]
         missing_df["Missing %"] = round((missing_df["Missing Values"] / len(df)) * 100, 2)
-        st.dataframe(missing_df)
+        
+        # Color formatting for readability
+        missing_df = missing_df.style.background_gradient(cmap="Oranges")
+        st.dataframe(missing_df, use_container_width=True)
 
-    # 5) Info-like output
-    with st.expander("ℹ Dataset Information"):
+    # Dataset Information (df.info)
+    with st.expander("ℹ Dataset Information (df.info)"):
         buffer = io.StringIO()
         df.info(buf=buffer)
-        s = buffer.getvalue()
-        st.text(s)
+        info_str = buffer.getvalue()
+        st.text(info_str)
 
-    # 6) Basic Statistics
-    with st.expander("📊 Basic Statistical Summary"):
-        st.write(df.describe(include="all"))
-        
-    # 7) Unique values per categorical column
-    with st.expander("🔠 Unique Values in Categorical Columns"):
+    # Basic Statistics
+    with st.expander("📊 Statistical Summary"):
+        st.dataframe(df.describe(include="all"), use_container_width=True)
+
+    # Unique Categoricals
+    with st.expander("🔠 Unique Values (Categorical Columns)"):
         cat_cols = df.select_dtypes(include="object").columns
         for col in cat_cols:
-            st.write(f"**{col}**: {df[col].nunique()} unique values")
+            st.write(f"### {col}")
+            st.write(f"🟣 Unique Values: **{df[col].nunique()}**")
             st.write(df[col].unique())
+            st.markdown("---")
