@@ -2,6 +2,7 @@ import streamlit as st
 import math
 import time
 import pandas as pd
+import matplotlib.pyplot as plt
 import io
 
 # 79d125 - green
@@ -191,7 +192,6 @@ if page == "⏳ Data Loading":
             st.markdown("---")
             
 # Data Pre Processing
-
 if page == "🧹 Data Pre processing":
 
     st.header("🧹 Data Pre-processing")
@@ -205,20 +205,20 @@ if page == "🧹 Data Pre processing":
 
     df = st.session_state["df"]
 
-    # -----------------------------------------------------------
-    # SESSION STATE VARIABLES
-    # -----------------------------------------------------------
+    # Create processed DF if not exists
     if "df_processed" not in st.session_state:
         st.session_state["df_processed"] = df.copy()
 
-    # Separate message holders by section
+    df_processed = st.session_state["df_processed"]
+
+    # Message storage
     if "msg_missing" not in st.session_state:
         st.session_state["msg_missing"] = []
 
     if "msg_feature" not in st.session_state:
         st.session_state["msg_feature"] = []
 
-    df_processed = st.session_state["df_processed"]
+    st.success("Data loaded for preprocessing!")
 
     # -----------------------------------------------------------
     # 1️⃣ HANDLE MISSING VALUES
@@ -240,53 +240,59 @@ if page == "🧹 Data Pre processing":
     if handle_method == "Fill ALL missing with custom value":
         custom_value = st.text_input("Enter a value to fill missing cells:")
 
+    # Only show "Apply" if method selected
     if handle_method != "Do Nothing":
         if st.button("✔ Apply Missing Value Handling"):
             temp_df = df_processed.copy()
 
-            # PROCESSING OPTIONS
             if handle_method == "Drop rows with missing values":
                 temp_df = temp_df.dropna()
-                st.session_state["msg_missing"].append("✔ Rows with missing values dropped.")
+                st.session_state["msg_missing"] = ["✔ Rows with missing values dropped."]
 
             elif handle_method == "Fill numeric (mean) & categorical (mode)":
                 num_cols = temp_df.select_dtypes(include=["float", "int"]).columns
                 cat_cols = temp_df.select_dtypes(include=["object"]).columns
+
                 temp_df[num_cols] = temp_df[num_cols].fillna(temp_df[num_cols].mean())
                 temp_df[cat_cols] = temp_df[cat_cols].fillna(temp_df[cat_cols].mode().iloc[0])
-                st.session_state["msg_missing"].append("✔ Numeric → mean | Categorical → mode.")
+
+                st.session_state["msg_missing"] = ["✔ Numeric → mean | Categorical → mode."]
 
             elif handle_method == "Fill numeric (median)":
                 num_cols = temp_df.select_dtypes(include=["float", "int"]).columns
                 temp_df[num_cols] = temp_df[num_cols].fillna(temp_df[num_cols].median())
-                st.session_state["msg_missing"].append("✔ Numeric columns → median.")
+                st.session_state["msg_missing"] = ["✔ Numeric columns → median."]
 
             elif handle_method == "Fill ALL missing with custom value":
                 if custom_value != "":
                     temp_df = temp_df.fillna(custom_value)
-                    st.session_state["msg_missing"].append(
+                    st.session_state["msg_missing"] = [
                         f"✔ Filled all missing cells with '{custom_value}'."
-                    )
+                    ]
                 else:
                     st.warning("⚠ Please enter a custom value!")
 
+            # Store updated DF
             st.session_state["df_processed"] = temp_df
             df_processed = temp_df
 
-    # SHOW MESSAGES RIGHT BELOW THIS SECTION
-    for m in st.session_state["msg_missing"]:
-        st.success(m)
+    # Show message for missing value handling
+    for msg in st.session_state["msg_missing"]:
+        st.success(msg)
 
     st.markdown("---")
 
     # -----------------------------------------------------------
-    # 2️⃣ EXPLORE DATA DISTRIBUTIONS
+    # 2️⃣ EXPLORE DATA DISTRIBUTIONS (MULTIPLE COLUMNS)
     # -----------------------------------------------------------
     st.subheader("📊 Explore Data Distributions")
 
     numeric_cols = df_processed.select_dtypes(include=["float", "int"]).columns
 
-    selected_dist_cols = st.multiselect("Choose one or more columns:", numeric_cols)
+    selected_dist_cols = st.multiselect(
+        "Choose one or more columns:",
+        numeric_cols
+    )
 
     dist_type = st.radio(
         "Select visualization type:",
@@ -294,17 +300,18 @@ if page == "🧹 Data Pre processing":
         horizontal=True
     )
 
-    import matplotlib.pyplot as plt
-
     if selected_dist_cols:
         for col in selected_dist_cols:
             st.write(f"### 📌 {col}")
+
             fig, ax = plt.subplots()
 
             if dist_type == "Histogram":
                 ax.hist(df_processed[col].dropna(), bins=40)
+                ax.set_title(f"Histogram - {col}")
             else:
                 ax.boxplot(df_processed[col].dropna())
+                ax.set_title(f"Boxplot - {col}")
 
             st.pyplot(fig)
 
@@ -314,7 +321,7 @@ if page == "🧹 Data Pre processing":
     # 3️⃣ FEATURE ENGINEERING
     # -----------------------------------------------------------
     st.subheader("🛠 Feature Engineering")
-    st.write("Click the button to add Month and Season columns.")
+    st.write("Click to add **Month** & **Season** columns.")
 
     if st.button("⚙ Run Feature Engineering"):
         temp_df = df_processed.copy()
@@ -337,11 +344,11 @@ if page == "🧹 Data Pre processing":
         st.session_state["df_processed"] = temp_df
         df_processed = temp_df
 
-        st.session_state["msg_feature"].append("✔ Month & Season added successfully!")
+        st.session_state["msg_feature"] = ["✔ Month & Season added successfully!"]
 
-    # SHOW FEATURE ENGINEERING MESSAGES RIGHT HERE
-    for m in st.session_state["msg_feature"]:
-        st.success(m)
+    # Show feature engineering message
+    for msg in st.session_state["msg_feature"]:
+        st.success(msg)
 
     st.markdown("---")
 
