@@ -3,6 +3,7 @@ import math
 import time
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 import io
 
 # 79d125 - green
@@ -73,7 +74,7 @@ if page == "⏳ Data Loading":
 
     st.header("📄 Data Loading & Overview")
 
-    # Load the dataset
+    #Load the dataset
     @st.cache_data
     def load_data():
         url = "https://raw.githubusercontent.com/suryautharakumar/CMP7005_Programming_for_Data_Analysis/main/all_cities_combined.csv"
@@ -87,7 +88,7 @@ if page == "⏳ Data Loading":
 
     rows, cols = df.shape
 
-    # Top Summary Metrics (Attractive Cards)
+    #Top Summary Metrics (Attractive Cards)
     col1, col2, col3 = st.columns(3)
     col1.metric("Total Rows", f"{rows:,}")
     col2.metric("Total Columns", cols)
@@ -95,7 +96,6 @@ if page == "⏳ Data Loading":
     st.success("Dataset Loaded Successfully!")
     st.markdown("---")
 
-    # ---------------- USER ROW PREVIEW REQUEST ----------------
     st.subheader("🔍 Preview Dataset")
 
     preview_col1, preview_col2 = st.columns([2, 1])
@@ -119,7 +119,6 @@ if page == "⏳ Data Loading":
 
     st.markdown("---")
 
-    # ----------------- EXPANDERS -------------------
 
     # Column Data Types
     with st.expander("🧬 Column Data Types"):
@@ -138,7 +137,6 @@ if page == "⏳ Data Loading":
 
         st.markdown("---")
 
-        # ---------------- TOTAL MISSING VALUES PER CITY ----------------
         st.subheader("🏙 Total Missing Values per City")
 
         # Calculate missing values for each city
@@ -152,7 +150,6 @@ if page == "⏳ Data Loading":
 
         st.markdown("---")
 
-        # ---------------- Missing Values per City (Detailed) ----------------
         st.subheader("🧩 Missing Values by Column for Each City")
 
         cities = df["City"].unique()
@@ -196,22 +193,19 @@ if page == "🧹 Data Pre processing":
 
     st.header("🧹 Data Pre-processing")
 
-    # -----------------------------------------------------------
-    # CHECK IF DATA LOADED
-    # -----------------------------------------------------------
+    #check data loaded
     if "df" not in st.session_state:
         st.error("❌ Dataset not loaded. Go to '⏳ Data Loading' first.")
         st.stop()
 
     df = st.session_state["df"]
 
-    # Create processed DF if not exists
     if "df_processed" not in st.session_state:
         st.session_state["df_processed"] = df.copy()
 
     df_processed = st.session_state["df_processed"]
 
-    # Message storage
+    #Message storage
     if "msg_missing" not in st.session_state:
         st.session_state["msg_missing"] = []
 
@@ -220,9 +214,7 @@ if page == "🧹 Data Pre processing":
 
     st.success("Data loaded for preprocessing!")
 
-    # -----------------------------------------------------------
-    # 1️⃣ HANDLE MISSING VALUES
-    # -----------------------------------------------------------
+   #Handle missing values
     st.subheader("🚨 Handle Missing Values")
 
     handle_method = st.selectbox(
@@ -240,7 +232,6 @@ if page == "🧹 Data Pre processing":
     if handle_method == "Fill ALL missing with custom value":
         custom_value = st.text_input("Enter a value to fill missing cells:")
 
-    # Only show "Apply" if method selected
     if handle_method != "Do Nothing":
         if st.button("✔ Apply"):
             temp_df = df_processed.copy()
@@ -276,15 +267,12 @@ if page == "🧹 Data Pre processing":
             st.session_state["df_processed"] = temp_df
             df_processed = temp_df
 
-    # Show message for missing value handling
     for msg in st.session_state["msg_missing"]:
         st.success(msg)
 
     st.markdown("---")
 
-    # -----------------------------------------------------------
-    # 2️⃣ EXPLORE DATA DISTRIBUTIONS (MULTIPLE COLUMNS)
-    # -----------------------------------------------------------
+    #EDA
     st.subheader("📊 Explore Data Distributions")
 
     numeric_cols = df_processed.select_dtypes(include=["float", "int"]).columns
@@ -317,9 +305,7 @@ if page == "🧹 Data Pre processing":
 
     st.markdown("---")
 
-    # -----------------------------------------------------------
-    # 3️⃣ FEATURE ENGINEERING
-    # -----------------------------------------------------------
+    #feature Engineering
     st.subheader("🛠 Feature Engineering")
     st.write("Click to add **Month** & **Season** columns.")
 
@@ -346,15 +332,13 @@ if page == "🧹 Data Pre processing":
 
         st.session_state["msg_feature"] = ["✔ Month & Season added successfully!"]
 
-    # Show feature engineering message
+    #feature engineering message
     for msg in st.session_state["msg_feature"]:
         st.success(msg)
 
     st.markdown("---")
 
-    # -----------------------------------------------------------
-    # 4️⃣ VIEW PROCESSED DATA
-    # -----------------------------------------------------------
+    #View Proced data
     st.subheader("👀 View Processed Data")
 
     if "show_preview" not in st.session_state:
@@ -383,9 +367,8 @@ if page == "🧹 Data Pre processing":
             st.dataframe(df_processed.head(rows_to_show), use_container_width=True)
 
     st.markdown("---")
-    # -----------------------------------------------------------
-    # 5️⃣ SUMMARY PANEL
-    # -----------------------------------------------------------
+   
+    #summary panel
     st.subheader("✨ Summary Panel")
 
     if st.button("📌 Show Summary"):
@@ -404,3 +387,221 @@ if page == "🧹 Data Pre processing":
             st.write(df_processed.describe(include='object'))
 
     st.markdown("---")
+
+
+if page == "📊 Data Visualization":
+
+    st.header("📊 Data Visualization")
+
+    # -----------------------------------------------------------
+    # CHECK IF PROCESSED DATA AVAILABLE
+    # -----------------------------------------------------------
+    if "df_processed" not in st.session_state:
+        st.error("❌ No processed data found. Please complete preprocessing first.")
+        st.stop()
+
+    df = st.session_state["df_processed"]
+
+    # ===========================================================
+    # 1️⃣ DATA OVERVIEW PANEL
+    # ===========================================================
+    st.subheader("✨ Quick Summary")
+
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Rows", df.shape[0])
+    col2.metric("Columns", df.shape[1])
+    col3.metric("Numeric Columns", len(df.select_dtypes(include=["float", "int"]).columns))
+    col4.metric("Categorical Columns", len(df.select_dtypes(include=["object"]).columns))
+
+    with st.expander("📋 Column Types"):
+        st.write(df.dtypes)
+
+    with st.expander("❗ Missing Values"):
+        st.write(df.isnull().sum())
+
+    st.markdown("---")
+
+    # ===========================================================
+    # 2️⃣ INTERACTIVE VISUALIZATION BUILDER
+    # ===========================================================
+    st.subheader("🎨 Custom Visualization")
+
+    chart_type = st.selectbox(
+        "Select a chart type:",
+        [
+            "Line Chart",
+            "Bar Chart",
+            "Area Chart",
+            "Scatter Plot",
+            "Pie Chart",
+            "Boxplot",
+            "Correlation Heatmap",
+        ]
+    )
+
+    numeric_cols = df.select_dtypes(include=["float", "int"]).columns
+    categorical_cols = df.select_dtypes(include=["object", "category"]).columns
+
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    # -----------------------------------------------------------
+    # LINE / AREA / BAR CHART
+    # -----------------------------------------------------------
+    if chart_type in ["Line Chart", "Area Chart", "Bar Chart"]:
+        x_axis = st.selectbox("X-axis column:", df.columns)
+        y_axis = st.multiselect("Y-axis column(s):", numeric_cols)
+
+        if y_axis:
+            if chart_type == "Line Chart":
+                st.line_chart(df.set_index(x_axis)[y_axis])
+            elif chart_type == "Area Chart":
+                st.area_chart(df.set_index(x_axis)[y_axis])
+            else:
+                st.bar_chart(df.set_index(x_axis)[y_axis])
+
+    # -----------------------------------------------------------
+    # PIE CHART
+    # -----------------------------------------------------------
+    elif chart_type == "Pie Chart":
+        pie_col = st.selectbox("Select categorical column:", categorical_cols)
+
+        if pie_col:
+            fig, ax = plt.subplots()
+            counts = df[pie_col].value_counts()
+            ax.pie(counts, labels=counts.index, autopct="%1.1f%%")
+            ax.set_title(f"Pie Chart of {pie_col}")
+            st.pyplot(fig)
+
+    # -----------------------------------------------------------
+    # SCATTER PLOT
+    # -----------------------------------------------------------
+    elif chart_type == "Scatter Plot":
+        x = st.selectbox("X-axis (numeric):", numeric_cols)
+        y = st.selectbox("Y-axis (numeric):", numeric_cols)
+        color = st.selectbox("Group by (optional):", ["None"] + list(categorical_cols))
+
+        fig, ax = plt.subplots()
+
+        if color != "None":
+            for v in df[color].unique():
+                sub = df[df[color] == v]
+                ax.scatter(sub[x], sub[y], label=v)
+            ax.legend()
+        else:
+            ax.scatter(df[x], df[y])
+
+        ax.set_title(f"{x} vs {y}")
+        st.pyplot(fig)
+
+    # -----------------------------------------------------------
+    # BOX PLOT
+    # -----------------------------------------------------------
+    elif chart_type == "Boxplot":
+        col = st.selectbox("Select numeric column:", numeric_cols)
+        fig, ax = plt.subplots()
+        ax.boxplot(df[col].dropna())
+        ax.set_title(f"Boxplot of {col}")
+        st.pyplot(fig)
+
+    # -----------------------------------------------------------
+    # CORRELATION HEATMAP
+    # -----------------------------------------------------------
+    elif chart_type == "Correlation Heatmap":
+        corr = df[numeric_cols].corr()
+
+        fig, ax = plt.subplots(figsize=(8, 6))
+        cax = ax.matshow(corr)
+        fig.colorbar(cax)
+
+        ax.set_xticks(range(len(numeric_cols)))
+        ax.set_yticks(range(len(numeric_cols)))
+        ax.set_xticklabels(numeric_cols, rotation=45)
+        ax.set_yticklabels(numeric_cols)
+
+        ax.set_title("Correlation Heatmap")
+        st.pyplot(fig)
+
+    st.markdown("---")
+
+    # ===========================================================
+    # 3️⃣ ADVANCED VISUALIZATION
+    # ===========================================================
+    st.subheader("🚀 Advanced Visualizations")
+
+    adv_chart = st.selectbox(
+        "Choose advanced option:",
+        [
+            "Scatter Matrix",
+            "Grouped Aggregation",
+            "Feature vs Target",
+            "Outlier Detection",
+        ]
+    )
+
+    # -----------------------------------------------------------
+    # SCATTER MATRIX
+    # -----------------------------------------------------------
+    if adv_chart == "Scatter Matrix":
+        from pandas.plotting import scatter_matrix
+
+        selected_cols = st.multiselect("Select up to 5 numeric columns:", numeric_cols)
+
+        if len(selected_cols) > 0:
+            fig = scatter_matrix(df[selected_cols], figsize=(10, 8))
+            st.pyplot(plt.gcf())
+
+    # -----------------------------------------------------------
+    # GROUPED AGGREGATION
+    # -----------------------------------------------------------
+    elif adv_chart == "Grouped Aggregation":
+        group_col = st.selectbox("Group by (categorical):", categorical_cols)
+        agg_col = st.selectbox("Aggregate column (numeric):", numeric_cols)
+        func = st.selectbox("Aggregation function:", ["mean", "sum", "count"])
+
+        result = df.groupby(group_col)[agg_col].agg(func)
+        st.bar_chart(result)
+
+    # -----------------------------------------------------------
+    # FEATURE vs TARGET ANALYSIS
+    # -----------------------------------------------------------
+    elif adv_chart == "Feature vs Target":
+        target = st.selectbox("Target column (numeric):", numeric_cols)
+        feature = st.selectbox("Feature column:", df.columns)
+
+        fig, ax = plt.subplots()
+
+        if df[feature].dtype in ["float64", "int64"]:
+            ax.scatter(df[feature], df[target])
+            ax.set_xlabel(feature)
+            ax.set_ylabel(target)
+        else:
+            df.groupby(feature)[target].mean().plot(kind='bar', ax=ax)
+
+        st.pyplot(fig)
+
+    # -----------------------------------------------------------
+    # OUTLIER DETECTION
+    # -----------------------------------------------------------
+    elif adv_chart == "Outlier Detection":
+        metric_col = st.selectbox("Select numeric column:", numeric_cols)
+
+        Q1 = df[metric_col].quantile(0.25)
+        Q3 = df[metric_col].quantile(0.75)
+        IQR = Q3 - Q1
+
+        lower = Q1 - 1.5 * IQR
+        upper = Q3 + 1.5 * IQR
+
+        outliers = df[(df[metric_col] < lower) | (df[metric_col] > upper)]
+
+        st.warning(f"Found {len(outliers)} outliers in **{metric_col}**")
+
+        fig, ax = plt.subplots()
+        ax.boxplot(df[metric_col].dropna())
+        ax.set_title(f"Outlier Detection for {metric_col}")
+        st.pyplot(fig)
+
+        with st.expander("Show Outlier Rows"):
+            st.write(outliers)
+
