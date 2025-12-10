@@ -393,18 +393,14 @@ if page == "📊 Data Visualization":
 
     st.header("📊 Data Visualization")
 
-    # -----------------------------------------------------------
-    # CHECK IF PROCESSED DATA AVAILABLE
-    # -----------------------------------------------------------
+ 
     if "df_processed" not in st.session_state:
-        st.error("❌ No processed data found. Please complete preprocessing first.")
+        st.error("❌ No processed data found. Please complete preprocessing first. Missing values and feature engineering")
         st.stop()
 
     df = st.session_state["df_processed"]
 
-    # ===========================================================
-    # 1️⃣ DATA OVERVIEW PANEL
-    # ===========================================================
+   
     st.subheader("✨ Quick Summary")
 
     col1, col2, col3, col4 = st.columns(4)
@@ -421,9 +417,6 @@ if page == "📊 Data Visualization":
 
     st.markdown("---")
 
-    # ===========================================================
-    # 2️⃣ INTERACTIVE VISUALIZATION BUILDER
-    # ===========================================================
     st.subheader("🎨 Custom Visualization")
 
     chart_type = st.selectbox(
@@ -445,9 +438,7 @@ if page == "📊 Data Visualization":
     import matplotlib.pyplot as plt
     import numpy as np
 
-    # -----------------------------------------------------------
-    # LINE / AREA / BAR CHART
-    # -----------------------------------------------------------
+    #line, area, bar
     if chart_type in ["Line Chart", "Area Chart", "Bar Chart"]:
         x_axis = st.selectbox("X-axis column:", df.columns)
         y_axis = st.multiselect("Y-axis column(s):", numeric_cols)
@@ -460,9 +451,7 @@ if page == "📊 Data Visualization":
             else:
                 st.bar_chart(df.set_index(x_axis)[y_axis])
 
-    # -----------------------------------------------------------
-    # PIE CHART
-    # -----------------------------------------------------------
+    #pie
     elif chart_type == "Pie Chart":
         pie_col = st.selectbox("Select categorical column:", categorical_cols)
 
@@ -473,9 +462,7 @@ if page == "📊 Data Visualization":
             ax.set_title(f"Pie Chart of {pie_col}")
             st.pyplot(fig)
 
-    # -----------------------------------------------------------
-    # SCATTER PLOT
-    # -----------------------------------------------------------
+    #Scatter plot
     elif chart_type == "Scatter Plot":
         x = st.selectbox("X-axis (numeric):", numeric_cols)
         y = st.selectbox("Y-axis (numeric):", numeric_cols)
@@ -494,9 +481,7 @@ if page == "📊 Data Visualization":
         ax.set_title(f"{x} vs {y}")
         st.pyplot(fig)
 
-    # -----------------------------------------------------------
-    # BOX PLOT
-    # -----------------------------------------------------------
+    #box
     elif chart_type == "Boxplot":
         col = st.selectbox("Select numeric column:", numeric_cols)
         fig, ax = plt.subplots()
@@ -504,9 +489,7 @@ if page == "📊 Data Visualization":
         ax.set_title(f"Boxplot of {col}")
         st.pyplot(fig)
 
-    # -----------------------------------------------------------
-    # CORRELATION HEATMAP
-    # -----------------------------------------------------------
+    #correlation
     elif chart_type == "Correlation Heatmap":
         corr = df[numeric_cols].corr()
 
@@ -524,9 +507,7 @@ if page == "📊 Data Visualization":
 
     st.markdown("---")
 
-    # ===========================================================
-    # 3️⃣ ADVANCED VISUALIZATION
-    # ===========================================================
+    #Adv Vis
     st.subheader("🚀 Advanced Visualizations")
 
     adv_chart = st.selectbox(
@@ -539,9 +520,7 @@ if page == "📊 Data Visualization":
         ]
     )
 
-    # -----------------------------------------------------------
-    # SCATTER MATRIX
-    # -----------------------------------------------------------
+    #scatter
     if adv_chart == "Scatter Matrix":
         from pandas.plotting import scatter_matrix
 
@@ -551,9 +530,7 @@ if page == "📊 Data Visualization":
             fig = scatter_matrix(df[selected_cols], figsize=(10, 8))
             st.pyplot(plt.gcf())
 
-    # -----------------------------------------------------------
-    # GROUPED AGGREGATION
-    # -----------------------------------------------------------
+    #Grouped Agg
     elif adv_chart == "Grouped Aggregation":
         group_col = st.selectbox("Group by (categorical):", categorical_cols)
         agg_col = st.selectbox("Aggregate column (numeric):", numeric_cols)
@@ -562,27 +539,8 @@ if page == "📊 Data Visualization":
         result = df.groupby(group_col)[agg_col].agg(func)
         st.bar_chart(result)
 
-    # -----------------------------------------------------------
-    # FEATURE vs TARGET ANALYSIS
-    # -----------------------------------------------------------
-    elif adv_chart == "Feature vs Target":
-        target = st.selectbox("Target column (numeric):", numeric_cols)
-        feature = st.selectbox("Feature column:", df.columns)
 
-        fig, ax = plt.subplots()
-
-        if df[feature].dtype in ["float64", "int64"]:
-            ax.scatter(df[feature], df[target])
-            ax.set_xlabel(feature)
-            ax.set_ylabel(target)
-        else:
-            df.groupby(feature)[target].mean().plot(kind='bar', ax=ax)
-
-        st.pyplot(fig)
-
-    # -----------------------------------------------------------
-    # OUTLIER DETECTION
-    # -----------------------------------------------------------
+    #outlier
     elif adv_chart == "Outlier Detection":
         metric_col = st.selectbox("Select numeric column:", numeric_cols)
 
@@ -605,3 +563,92 @@ if page == "📊 Data Visualization":
         with st.expander("Show Outlier Rows"):
             st.write(outliers)
 
+    #extra
+    st.markdown("---")
+    st.subheader("📌 Additional Visualizations (Auto-Generated)")
+
+    numeric_cols = df.select_dtypes(include=["float", "int"]).columns
+    categorical_cols = df.select_dtypes(include=["object"]).columns
+
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    st.write("### 🔹 Histograms for All Numeric Columns")
+    for col in numeric_cols:
+        st.write(f"#### 📊 {col}")
+        fig, ax = plt.subplots()
+        sns.histplot(df[col].dropna(), kde=True, ax=ax)
+        ax.set_title(f"Distribution of {col}")
+        st.pyplot(fig)
+
+    st.markdown("---")
+
+    
+    st.write("### 🔹 Boxplots for Outlier Examination")
+    for col in numeric_cols:
+        st.write(f"#### 📦 {col}")
+        fig, ax = plt.subplots()
+        sns.boxplot(x=df[col], ax=ax)
+        ax.set_title(f"Boxplot - {col}")
+        st.pyplot(fig)
+
+    st.markdown("---")
+
+   
+    st.write("### 🔹 Countplots for Categorical Columns")
+
+    for col in categorical_cols:
+        st.write(f"#### 🧮 {col}")
+        fig, ax = plt.subplots()
+        sns.countplot(x=df[col], ax=ax)
+        ax.set_title(f"Count of each Category: {col}")
+        plt.xticks(rotation=45)
+        st.pyplot(fig)
+
+    st.markdown("---")
+
+   
+    st.write("### 🔹 Pairwise Scatter Relationships (Pairplot)")
+
+    if len(numeric_cols) >= 2:
+        import seaborn as sns
+        sns.set(style="whitegrid")
+
+        pairplot_fig = sns.pairplot(df[numeric_cols].dropna())
+        st.pyplot(pairplot_fig)
+
+    st.markdown("---")
+
+    
+    st.write("### 🔹 High-Resolution Correlation Heatmap")
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.heatmap(df[numeric_cols].corr(), annot=True, cmap="coolwarm", linewidths=0.5, ax=ax)
+    ax.set_title("Correlation Matrix Heatmap")
+    st.pyplot(fig)
+
+    st.markdown("---")
+
+
+    if "Date" in df.columns:
+        st.write("### 🔹 Time Series Trend (Date vs Numeric Columns)")
+
+        for col in numeric_cols:
+            fig, ax = plt.subplots()
+            ax.plot(df["Date"], df[col])
+            ax.set_title(f"{col} Over Time")
+            ax.set_xlabel("Date")
+            ax.set_ylabel(col)
+            st.pyplot(fig)
+
+        st.markdown("---")
+
+
+    if "Season" in df.columns:
+        st.write("### 🔹 Seasonal Comparison (Across Seasons)")
+
+        for col in numeric_cols:
+            fig, ax = plt.subplots()
+            sns.boxplot(x=df["Season"], y=df[col], ax=ax)
+            ax.set_title(f"{col} by Season")
+            st.pyplot(fig)
