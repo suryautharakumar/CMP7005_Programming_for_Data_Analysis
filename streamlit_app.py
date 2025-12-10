@@ -63,7 +63,7 @@ st.sidebar.markdown(
 st.sidebar.write("📈 Air Quality Data Analysis")
 page = st.sidebar.radio(
     "Select a feature to explore:",
-    ("⏳ Data Loading", "🧹 Data Pre processing", "Data Visualization")
+    ("⏳ Data Loading", "🧹 Data Pre processing", "📊 Data Visualization")
 )
 st.sidebar.markdown("---")
 
