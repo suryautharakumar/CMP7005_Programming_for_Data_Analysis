@@ -63,7 +63,7 @@ st.sidebar.markdown(
 st.sidebar.write("📈 Air Quality Data Analysis")
 page = st.sidebar.radio(
     "Select a feature to explore:",
-    ("⏳ Data Loading", "🧹 Data Pre processing", "📊 Data Visualization", "🧠 Modelling & Prediction")
+    ("⏳ Data Loading", "🧹 Data Pre processing", "📊 Data Visualization", "🧠 Data Prediction")
 )
 st.sidebar.markdown("---")
 
@@ -567,182 +567,153 @@ if page == "🧠 Modelling & Prediction":
 
     st.header("🧠 Modelling & Prediction")
 
-    # -----------------------------------------------------------
-    # CHECK DATA
-    # -----------------------------------------------------------
+   
     if "df_processed" not in st.session_state:
-        st.error("❌ Please complete preprocessing before modelling.")
+        st.error("❌ Please complete Data Pre-processing first. Missing values and feature engineering")
         st.stop()
 
-    df = st.session_state["df_processed"]
+    df = st.session_state["df_processed"].copy()
 
-    # -----------------------------------------------------------
-    # IMPORTS
-    # -----------------------------------------------------------
-    from sklearn.model_selection import train_test_split
-    from sklearn.linear_model import LinearRegression
-    from sklearn.ensemble import RandomForestRegressor
-    from sklearn.tree import DecisionTreeRegressor
-    from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
-    import numpy as np
-    import matplotlib.pyplot as plt
+    st.success("Processed dataset loaded successfully!")
 
-    st.markdown("---")
+    st.subheader("🎯 Feature & Target Selection")
 
-    # ===========================================================
-    # 1️⃣ TARGET & FEATURE SELECTION
-    # ===========================================================
-    st.subheader("🎯 Target & Feature Selection")
+    target_col = "AQI"
 
     numeric_cols = df.select_dtypes(include=["float", "int"]).columns.tolist()
 
-    target = st.selectbox(
-        "Select Target Variable:",
-        numeric_cols,
-        index=numeric_cols.index("AQI") if "AQI" in numeric_cols else 0
+    if target_col not in numeric_cols:
+        st.error("❌ AQI column missing or not numeric.")
+        st.stop()
+
+    feature_cols = [col for col in numeric_cols if col != target_col]
+
+    selected_features = st.multiselect(
+        "Select input features:",
+        feature_cols,
+        default=feature_cols[:6]
     )
 
-    features = st.multiselect(
-        "Select Feature Columns:",
-        [c for c in numeric_cols if c != target],
-        default=[c for c in numeric_cols if c != target][:5]
-    )
-
-    if not features:
+    if len(selected_features) == 0:
         st.warning("⚠ Please select at least one feature.")
         st.stop()
 
-    X = df[features]
-    y = df[target]
+    X = df[selected_features]
+    y = df[target_col]
 
-    st.markdown("---")
-
-    # ===========================================================
-    # 2️⃣ TRAIN-TEST SPLIT
-    # ===========================================================
+#test train
     st.subheader("✂ Train-Test Split")
 
-    test_size = st.slider(
-        "Test Size (%)",
-        min_value=10,
-        max_value=40,
-        value=20
-    ) / 100
+    test_size = st.slider("Test size (%)", 10, 40, 20) / 100
+
+    from sklearn.model_selection import train_test_split
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=test_size, random_state=42
     )
 
-    st.info(
-        f"Training samples: {len(X_train)} | Testing samples: {len(X_test)}"
-    )
+    st.info(f"Training rows: {len(X_train)} | Testing rows: {len(X_test)}")
 
+#comparison
     st.markdown("---")
+    st.subheader("📊 Model Comparison")
 
-    # ===========================================================
-    # 3️⃣ MODEL SELECTION
-    # ===========================================================
-    st.subheader("🤖 Model Selection")
+    from sklearn.linear_model import LinearRegression
+    from sklearn.tree import DecisionTreeRegressor
+    from sklearn.ensemble import RandomForestRegressor
+    from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+    import numpy as np
+    import pandas as pd
 
-    model_name = st.selectbox(
-        "Choose a model:",
-        [
-            "Linear Regression",
-            "Decision Tree Regressor",
-            "Random Forest Regressor"
-        ]
-    )
+    if "model_comparison" not in st.session_state:
+        st.session_state["model_comparison"] = None
 
-    if model_name == "Linear Regression":
-        model = LinearRegression()
+    if st.button("📊 Compare Models"):
 
-    elif model_name == "Decision Tree Regressor":
-        max_depth = st.slider("Max Depth", 2, 20, 5)
-        model = DecisionTreeRegressor(max_depth=max_depth, random_state=42)
+        with st.spinner("Training models and evaluating..."):
 
-    else:
-        n_estimators = st.slider("Number of Trees", 50, 300, 100)
-        model = RandomForestRegressor(
-            n_estimators=n_estimators,
+            models = {
+                "Linear Regression": LinearRegression(),
+                "Decision Tree": DecisionTreeRegressor(max_depth=6, random_state=42),
+                "Random Forest": RandomForestRegressor(
+                    n_estimators=100,
+                    random_state=42
+                )
+            }
+
+            results = []
+
+            for name, model in models.items():
+                model.fit(X_train, y_train)
+                preds = model.predict(X_test)
+
+                results.append({
+                    "Model": name,
+                    "R² Score": round(r2_score(y_test, preds), 3),
+                    "MAE": round(mean_absolute_error(y_test, preds), 2),
+                    "RMSE": round(np.sqrt(mean_squared_error(y_test, preds)), 2)
+                })
+
+            results_df = pd.DataFrame(results).sort_values(
+                "R² Score", ascending=False
+            )
+
+            st.session_state["model_comparison"] = results_df
+
+    #display
+    if st.session_state["model_comparison"] is not None:
+
+        st.subheader("📋 Model Performance Comparison")
+
+        styled_df = (
+            st.session_state["model_comparison"]
+            .style
+            .highlight_max(subset=["R² Score"], color="#90EE90")
+            .highlight_min(subset=["MAE", "RMSE"], color="#90EE90")
+        )
+
+        st.dataframe(styled_df, use_container_width=True)
+
+        best_model_name = st.session_state["model_comparison"].iloc[0]["Model"]
+        best_r2 = st.session_state["model_comparison"].iloc[0]["R² Score"]
+
+        st.success(f"🏆 Best Model: **{best_model_name}** (R² = {best_r2})")
+
+    #Train best model
+    st.markdown("---")
+    st.subheader("🔮 AQI Prediction")
+
+    model_map = {
+        "Linear Regression": LinearRegression(),
+        "Decision Tree": DecisionTreeRegressor(max_depth=6, random_state=42),
+        "Random Forest": RandomForestRegressor(
+            n_estimators=100,
             random_state=42
         )
+    }
+
+    chosen_model_name = st.selectbox(
+        "Select model for prediction:",
+        list(model_map.keys())
+    )
+
+    model = model_map[chosen_model_name]
+    model.fit(X_train, y_train)
+
+    st.markdown("### 🧪 Enter feature values")
+
+    user_input = {}
+    for col in selected_features:
+        user_input[col] = st.number_input(
+            f"{col}",
+            value=float(X[col].mean())
+        )
+
+    if st.button("📈 Predict AQI"):
+        input_df = pd.DataFrame([user_input])
+        prediction = model.predict(input_df)[0]
+
+        st.success(f"🌍 **Predicted AQI:** {round(prediction, 2)}")
 
     st.markdown("---")
-
-    # ===========================================================
-    # 4️⃣ TRAIN MODEL
-    # ===========================================================
-    st.subheader("🚀 Train Model")
-
-    if st.button("⚙ Train Model"):
-        with st.spinner("Training model..."):
-            model.fit(X_train, y_train)
-
-        st.session_state["trained_model"] = model
-        st.success("✅ Model trained successfully!")
-
-    # ===========================================================
-    # 5️⃣ MODEL EVALUATION
-    # ===========================================================
-    if "trained_model" in st.session_state:
-
-        model = st.session_state["trained_model"]
-
-        y_pred = model.predict(X_test)
-
-        r2 = r2_score(y_test, y_pred)
-        mae = mean_absolute_error(y_test, y_pred)
-        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-
-        st.markdown("---")
-        st.subheader("📊 Model Performance")
-
-        col1, col2, col3 = st.columns(3)
-        col1.metric("R² Score", round(r2, 3))
-        col2.metric("MAE", round(mae, 2))
-        col3.metric("RMSE", round(rmse, 2))
-
-        # -------------------------------------------------------
-        # ACTUAL vs PREDICTED
-        # -------------------------------------------------------
-        st.markdown("---")
-        st.subheader("📈 Actual vs Predicted")
-
-        fig, ax = plt.subplots()
-        ax.scatter(y_test, y_pred)
-        ax.plot(
-            [y_test.min(), y_test.max()],
-            [y_test.min(), y_test.max()],
-            linestyle="--"
-        )
-        ax.set_xlabel("Actual Values")
-        ax.set_ylabel("Predicted Values")
-        ax.set_title("Actual vs Predicted")
-        st.pyplot(fig)
-
-        # -------------------------------------------------------
-        # RESIDUAL PLOT
-        # -------------------------------------------------------
-        st.subheader("📉 Residual Analysis")
-
-        residuals = y_test - y_pred
-
-        fig, ax = plt.subplots()
-        ax.scatter(y_pred, residuals)
-        ax.axhline(0, linestyle="--")
-        ax.set_xlabel("Predicted Values")
-        ax.set_ylabel("Residuals")
-        ax.set_title("Residual Plot")
-        st.pyplot(fig)
-
-        # -------------------------------------------------------
-        # SHOW PREDICTIONS TABLE
-        # -------------------------------------------------------
-        st.subheader("📋 Prediction Sample")
-
-        pred_df = pd.DataFrame({
-            "Actual": y_test.values,
-            "Predicted": y_pred
-        })
-
-        st.dataframe(pred_df.head(10), use_container_width=True)
+    st.info("✅ Modelling & Prediction completed successfully.")
