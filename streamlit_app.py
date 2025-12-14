@@ -63,7 +63,7 @@ st.sidebar.markdown(
 st.sidebar.write("📈 Air Quality Data Analysis")
 page = st.sidebar.radio(
     "Select a feature to explore:",
-    ("⏳ Data Loading", "🧹 Data Pre processing", "📊 Data Visualization")
+    ("⏳ Data Loading", "🧹 Data Pre processing", "📊 Data Visualization", "🧠 Modelling & Prediction")
 )
 st.sidebar.markdown("---")
 
@@ -515,7 +515,6 @@ if page == "📊 Data Visualization":
         [
             "Scatter Matrix",
             "Grouped Aggregation",
-            "Feature vs Target",
             "Outlier Detection",
         ]
     )
@@ -562,3 +561,188 @@ if page == "📊 Data Visualization":
 
         with st.expander("Show Outlier Rows"):
             st.write(outliers)
+
+
+if page == "🧠 Modelling & Prediction":
+
+    st.header("🧠 Modelling & Prediction")
+
+    # -----------------------------------------------------------
+    # CHECK DATA
+    # -----------------------------------------------------------
+    if "df_processed" not in st.session_state:
+        st.error("❌ Please complete preprocessing before modelling.")
+        st.stop()
+
+    df = st.session_state["df_processed"]
+
+    # -----------------------------------------------------------
+    # IMPORTS
+    # -----------------------------------------------------------
+    from sklearn.model_selection import train_test_split
+    from sklearn.linear_model import LinearRegression
+    from sklearn.ensemble import RandomForestRegressor
+    from sklearn.tree import DecisionTreeRegressor
+    from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    st.markdown("---")
+
+    # ===========================================================
+    # 1️⃣ TARGET & FEATURE SELECTION
+    # ===========================================================
+    st.subheader("🎯 Target & Feature Selection")
+
+    numeric_cols = df.select_dtypes(include=["float", "int"]).columns.tolist()
+
+    target = st.selectbox(
+        "Select Target Variable:",
+        numeric_cols,
+        index=numeric_cols.index("AQI") if "AQI" in numeric_cols else 0
+    )
+
+    features = st.multiselect(
+        "Select Feature Columns:",
+        [c for c in numeric_cols if c != target],
+        default=[c for c in numeric_cols if c != target][:5]
+    )
+
+    if not features:
+        st.warning("⚠ Please select at least one feature.")
+        st.stop()
+
+    X = df[features]
+    y = df[target]
+
+    st.markdown("---")
+
+    # ===========================================================
+    # 2️⃣ TRAIN-TEST SPLIT
+    # ===========================================================
+    st.subheader("✂ Train-Test Split")
+
+    test_size = st.slider(
+        "Test Size (%)",
+        min_value=10,
+        max_value=40,
+        value=20
+    ) / 100
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=42
+    )
+
+    st.info(
+        f"Training samples: {len(X_train)} | Testing samples: {len(X_test)}"
+    )
+
+    st.markdown("---")
+
+    # ===========================================================
+    # 3️⃣ MODEL SELECTION
+    # ===========================================================
+    st.subheader("🤖 Model Selection")
+
+    model_name = st.selectbox(
+        "Choose a model:",
+        [
+            "Linear Regression",
+            "Decision Tree Regressor",
+            "Random Forest Regressor"
+        ]
+    )
+
+    if model_name == "Linear Regression":
+        model = LinearRegression()
+
+    elif model_name == "Decision Tree Regressor":
+        max_depth = st.slider("Max Depth", 2, 20, 5)
+        model = DecisionTreeRegressor(max_depth=max_depth, random_state=42)
+
+    else:
+        n_estimators = st.slider("Number of Trees", 50, 300, 100)
+        model = RandomForestRegressor(
+            n_estimators=n_estimators,
+            random_state=42
+        )
+
+    st.markdown("---")
+
+    # ===========================================================
+    # 4️⃣ TRAIN MODEL
+    # ===========================================================
+    st.subheader("🚀 Train Model")
+
+    if st.button("⚙ Train Model"):
+        with st.spinner("Training model..."):
+            model.fit(X_train, y_train)
+
+        st.session_state["trained_model"] = model
+        st.success("✅ Model trained successfully!")
+
+    # ===========================================================
+    # 5️⃣ MODEL EVALUATION
+    # ===========================================================
+    if "trained_model" in st.session_state:
+
+        model = st.session_state["trained_model"]
+
+        y_pred = model.predict(X_test)
+
+        r2 = r2_score(y_test, y_pred)
+        mae = mean_absolute_error(y_test, y_pred)
+        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+
+        st.markdown("---")
+        st.subheader("📊 Model Performance")
+
+        col1, col2, col3 = st.columns(3)
+        col1.metric("R² Score", round(r2, 3))
+        col2.metric("MAE", round(mae, 2))
+        col3.metric("RMSE", round(rmse, 2))
+
+        # -------------------------------------------------------
+        # ACTUAL vs PREDICTED
+        # -------------------------------------------------------
+        st.markdown("---")
+        st.subheader("📈 Actual vs Predicted")
+
+        fig, ax = plt.subplots()
+        ax.scatter(y_test, y_pred)
+        ax.plot(
+            [y_test.min(), y_test.max()],
+            [y_test.min(), y_test.max()],
+            linestyle="--"
+        )
+        ax.set_xlabel("Actual Values")
+        ax.set_ylabel("Predicted Values")
+        ax.set_title("Actual vs Predicted")
+        st.pyplot(fig)
+
+        # -------------------------------------------------------
+        # RESIDUAL PLOT
+        # -------------------------------------------------------
+        st.subheader("📉 Residual Analysis")
+
+        residuals = y_test - y_pred
+
+        fig, ax = plt.subplots()
+        ax.scatter(y_pred, residuals)
+        ax.axhline(0, linestyle="--")
+        ax.set_xlabel("Predicted Values")
+        ax.set_ylabel("Residuals")
+        ax.set_title("Residual Plot")
+        st.pyplot(fig)
+
+        # -------------------------------------------------------
+        # SHOW PREDICTIONS TABLE
+        # -------------------------------------------------------
+        st.subheader("📋 Prediction Sample")
+
+        pred_df = pd.DataFrame({
+            "Actual": y_test.values,
+            "Predicted": y_pred
+        })
+
+        st.dataframe(pred_df.head(10), use_container_width=True)
