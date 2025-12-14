@@ -15,7 +15,7 @@ st.set_page_config(page_title="All Cities Air Quality Data Analysis | Cardiff Me
 st.markdown("""
     <style>
         [data-testid="stAppViewContainer"] {
-            background-image: url("https://img.freepik.com/premium-vector/halftone-gray-dots-background_127747-42.jpg?semt=ais_hybrid&w=740&q=80");
+            background-image: url("https://img.freepik.com/premium-photo/white-background_1129442-449.jpg?semt=ais_hybrid&w=740&q=80");
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
