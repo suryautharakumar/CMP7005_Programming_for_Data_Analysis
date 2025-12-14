@@ -563,7 +563,7 @@ if page == "📊 Data Visualization":
             st.write(outliers)
 
 
-if page == "🧠 Modelling & Prediction":
+if page == "🧠 Data Prediction":
 
     st.header("🧠 Modelling & Prediction")
 
