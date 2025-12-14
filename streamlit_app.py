@@ -63,7 +63,7 @@ st.sidebar.markdown(
 st.sidebar.write("📈 Air Quality Data Analysis")
 page = st.sidebar.radio(
     "Select a feature to explore:",
-    ("⏳ Data Loading", "🧹 Data Pre processing", "📊 Data Visualization", "🧠 Data Prediction")
+    ("⏳ Data Loading", "🧹 Data Pre processing", "📊 Data Visualization", "🧠 Data Prediction", "🧪 AQI Category Prediction")
 )
 st.sidebar.markdown("---")
 
@@ -717,3 +717,168 @@ if page == "🧠 Data Prediction":
 
     st.markdown("---")
     st.info("✅ Modelling & Prediction completed successfully.")
+
+
+if page == "🧪 AQI Category Prediction":
+
+    st.header("🧪 AQI Category Prediction (Classification)")
+
+    # -----------------------------------------------------------
+    # CHECK DATA
+    # -----------------------------------------------------------
+    if "df_processed" not in st.session_state:
+        st.error("❌ Please complete Data Pre-processing first.")
+        st.stop()
+
+    df = st.session_state["df_processed"].copy()
+
+    if "AQI_Bucket" not in df.columns:
+        st.error("❌ AQI_Bucket column not found.")
+        st.stop()
+
+    st.success("Processed dataset loaded successfully!")
+
+    # -----------------------------------------------------------
+    # DATA PREPARATION
+    # -----------------------------------------------------------
+    st.subheader("📂 Data Preparation")
+
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import LabelEncoder
+    from sklearn.metrics import accuracy_score, classification_report
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.tree import DecisionTreeClassifier
+    from sklearn.ensemble import RandomForestClassifier
+    import pandas as pd
+    import numpy as np
+
+    numeric_cols = df.select_dtypes(include=["float", "int"]).columns.tolist()
+    numeric_cols = [c for c in numeric_cols if c != "AQI"]
+
+    target = "AQI_Bucket"
+
+    X = df[numeric_cols].fillna(df[numeric_cols].median())
+    y = df[target]
+
+    label_encoder = LabelEncoder()
+    y_encoded = label_encoder.fit_transform(y)
+
+    st.info(f"Features used: {len(numeric_cols)} | Classes: {len(label_encoder.classes_)}")
+
+    # -----------------------------------------------------------
+    # TRAIN-TEST SPLIT
+    # -----------------------------------------------------------
+    test_size = st.slider("Test size (%)", 10, 40, 20) / 100
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y_encoded, test_size=test_size, random_state=42, stratify=y_encoded
+    )
+
+    # -----------------------------------------------------------
+    # MODEL COMPARISON
+    # -----------------------------------------------------------
+    st.markdown("---")
+    st.subheader("📊 Classification Model Comparison")
+
+    if "clf_results" not in st.session_state:
+        st.session_state["clf_results"] = None
+
+    if st.button("📊 Train & Compare Models"):
+
+        with st.spinner("Training classification models..."):
+
+            classifiers = {
+                "Logistic Regression": LogisticRegression(max_iter=1000),
+                "Decision Tree": DecisionTreeClassifier(max_depth=6),
+                "Random Forest": RandomForestClassifier(n_estimators=150, random_state=42)
+            }
+
+            results = []
+
+            for name, clf in classifiers.items():
+                clf.fit(X_train, y_train)
+                preds = clf.predict(X_test)
+
+                acc = accuracy_score(y_test, preds)
+
+                results.append({
+                    "Model": name,
+                    "Accuracy": round(acc, 3)
+                })
+
+            results_df = pd.DataFrame(results).sort_values("Accuracy", ascending=False)
+            st.session_state["clf_results"] = results_df
+
+    # -----------------------------------------------------------
+    # DISPLAY RESULTS
+    # -----------------------------------------------------------
+    if st.session_state["clf_results"] is not None:
+
+        st.subheader("📋 Model Accuracy Comparison")
+
+        styled_df = (
+            st.session_state["clf_results"]
+            .style
+            .highlight_max(subset=["Accuracy"], color="#90EE90")
+        )
+
+        st.dataframe(styled_df, use_container_width=True)
+
+        best_model_name = st.session_state["clf_results"].iloc[0]["Model"]
+        st.success(f"🏆 Best Model: **{best_model_name}**")
+
+    # -----------------------------------------------------------
+    # DETAILED CLASSIFICATION REPORT
+    # -----------------------------------------------------------
+    st.markdown("---")
+    st.subheader("📑 Classification Report")
+
+    model_choice = st.selectbox(
+        "Select model for detailed evaluation:",
+        ["Logistic Regression", "Decision Tree", "Random Forest"]
+    )
+
+    model_map = {
+        "Logistic Regression": LogisticRegression(max_iter=1000),
+        "Decision Tree": DecisionTreeClassifier(max_depth=6),
+        "Random Forest": RandomForestClassifier(n_estimators=150, random_state=42)
+    }
+
+    clf = model_map[model_choice]
+    clf.fit(X_train, y_train)
+    preds = clf.predict(X_test)
+
+    report = classification_report(
+        y_test,
+        preds,
+        target_names=label_encoder.classes_,
+        output_dict=True
+    )
+
+    report_df = pd.DataFrame(report).transpose()
+    st.dataframe(report_df, use_container_width=True)
+
+    # -----------------------------------------------------------
+    # SINGLE AQI CATEGORY PREDICTION
+    # -----------------------------------------------------------
+    st.markdown("---")
+    st.subheader("🔮 Predict AQI Category")
+
+    st.markdown("### 🧪 Enter pollutant values")
+
+    user_input = {}
+    for col in numeric_cols:
+        user_input[col] = st.number_input(
+            f"{col}",
+            value=float(X[col].mean())
+        )
+
+    if st.button("🧠 Predict AQI Category"):
+        input_df = pd.DataFrame([user_input])
+        pred_class = clf.predict(input_df)[0]
+        pred_label = label_encoder.inverse_transform([pred_class])[0]
+
+        st.success(f"🌍 **Predicted AQI Category:** {pred_label}")
+
+    st.markdown("---")
+    st.info("✅ AQI Category Classification completed successfully.")
