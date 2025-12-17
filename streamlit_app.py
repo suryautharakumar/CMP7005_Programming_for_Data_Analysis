@@ -396,14 +396,13 @@ if page == "📊 Data Visualization":
 
     st.header("📊 Data Visualization")
 
- 
     if "df_processed" not in st.session_state:
         st.error("❌ No processed data found. Please complete preprocessing first.")
         st.stop()
 
     df = st.session_state["df_processed"]
 
-   
+
     st.subheader("✨ Quick Summary")
 
     col1, col2, col3, col4 = st.columns(4)
@@ -414,6 +413,7 @@ if page == "📊 Data Visualization":
 
     st.markdown("---")
 
+    #custom
     st.subheader("🎨 Custom Visualization")
 
     chart_type = st.selectbox(
@@ -434,77 +434,94 @@ if page == "📊 Data Visualization":
 
     import matplotlib.pyplot as plt
     import numpy as np
+    import time
 
-    #line, area, bar
+    #Line/area/bar
     if chart_type in ["Line Chart", "Area Chart", "Bar Chart"]:
         x_axis = st.selectbox("X-axis column:", df.columns)
         y_axis = st.multiselect("Y-axis column(s):", numeric_cols)
 
         if y_axis:
-            if chart_type == "Line Chart":
-                st.line_chart(df.set_index(x_axis)[y_axis])
-            elif chart_type == "Area Chart":
-                st.area_chart(df.set_index(x_axis)[y_axis])
-            else:
-                st.bar_chart(df.set_index(x_axis)[y_axis])
+            with st.spinner("📊 Rendering chart..."):
+                time.sleep(0.6)
 
-    #pie
+                if chart_type == "Line Chart":
+                    st.line_chart(df.set_index(x_axis)[y_axis])
+                elif chart_type == "Area Chart":
+                    st.area_chart(df.set_index(x_axis)[y_axis])
+                else:
+                    st.bar_chart(df.set_index(x_axis)[y_axis])
+
+    #pie chart
     elif chart_type == "Pie Chart":
         pie_col = st.selectbox("Select categorical column:", categorical_cols)
 
         if pie_col:
-            fig, ax = plt.subplots()
-            counts = df[pie_col].value_counts()
-            ax.pie(counts, labels=counts.index, autopct="%1.1f%%")
-            ax.set_title(f"Pie Chart of {pie_col}")
-            st.pyplot(fig)
+            with st.spinner("🥧 Generating pie chart..."):
+                time.sleep(0.6)
 
-    #Scatter plot
+                fig, ax = plt.subplots()
+                counts = df[pie_col].value_counts()
+                ax.pie(counts, labels=counts.index, autopct="%1.1f%%")
+                ax.set_title(f"Pie Chart of {pie_col}")
+                st.pyplot(fig)
+
+    #scatter plot
     elif chart_type == "Scatter Plot":
         x = st.selectbox("X-axis (numeric):", numeric_cols)
         y = st.selectbox("Y-axis (numeric):", numeric_cols)
         color = st.selectbox("Group by (optional):", ["None"] + list(categorical_cols))
 
-        fig, ax = plt.subplots()
+        with st.spinner("🔵 Rendering scatter plot..."):
+            time.sleep(0.6)
 
-        if color != "None":
-            for v in df[color].unique():
-                sub = df[df[color] == v]
-                ax.scatter(sub[x], sub[y], label=v)
-            ax.legend()
-        else:
-            ax.scatter(df[x], df[y])
+            fig, ax = plt.subplots()
 
-        ax.set_title(f"{x} vs {y}")
-        st.pyplot(fig)
+            if color != "None":
+                for v in df[color].unique():
+                    sub = df[df[color] == v]
+                    ax.scatter(sub[x], sub[y], label=v)
+                ax.legend()
+            else:
+                ax.scatter(df[x], df[y])
 
-    #box
+            ax.set_title(f"{x} vs {y}")
+            st.pyplot(fig)
+
+    #boxplot
     elif chart_type == "Boxplot":
         col = st.selectbox("Select numeric column:", numeric_cols)
-        fig, ax = plt.subplots()
-        ax.boxplot(df[col].dropna())
-        ax.set_title(f"Boxplot of {col}")
-        st.pyplot(fig)
 
-    #correlation
+        with st.spinner("📦 Generating boxplot..."):
+            time.sleep(0.6)
+
+            fig, ax = plt.subplots()
+            ax.boxplot(df[col].dropna())
+            ax.set_title(f"Boxplot of {col}")
+            st.pyplot(fig)
+
+    #Correlation
     elif chart_type == "Correlation Heatmap":
-        corr = df[numeric_cols].corr()
+        with st.spinner("🔥 Calculating correlation matrix..."):
+            time.sleep(0.6)
 
-        fig, ax = plt.subplots(figsize=(8, 6))
-        cax = ax.matshow(corr)
-        fig.colorbar(cax)
+            corr = df[numeric_cols].corr()
 
-        ax.set_xticks(range(len(numeric_cols)))
-        ax.set_yticks(range(len(numeric_cols)))
-        ax.set_xticklabels(numeric_cols, rotation=45)
-        ax.set_yticklabels(numeric_cols)
+            fig, ax = plt.subplots(figsize=(8, 6))
+            cax = ax.matshow(corr)
+            fig.colorbar(cax)
 
-        ax.set_title("Correlation Heatmap")
-        st.pyplot(fig)
+            ax.set_xticks(range(len(numeric_cols)))
+            ax.set_yticks(range(len(numeric_cols)))
+            ax.set_xticklabels(numeric_cols, rotation=45)
+            ax.set_yticklabels(numeric_cols)
+
+            ax.set_title("Correlation Heatmap")
+            st.pyplot(fig)
 
     st.markdown("---")
 
-    #Adv Vis
+    #Adv
     st.subheader("🚀 Advanced Visualizations")
 
     adv_chart = st.selectbox(
@@ -522,49 +539,58 @@ if page == "📊 Data Visualization":
 
         selected_cols = st.multiselect("Select up to 5 numeric columns:", numeric_cols)
 
-        if len(selected_cols) > 0:
-            fig = scatter_matrix(df[selected_cols], figsize=(10, 8))
-            st.pyplot(plt.gcf())
+        if selected_cols:
+            with st.spinner("🧬 Creating scatter matrix..."):
+                time.sleep(0.6)
 
-    #Grouped Agg
+                fig = scatter_matrix(df[selected_cols], figsize=(10, 8))
+                st.pyplot(plt.gcf())
+
+    #grouped
     elif adv_chart == "Grouped Aggregation":
         group_col = st.selectbox("Group by (categorical):", categorical_cols)
         agg_col = st.selectbox("Aggregate column (numeric):", numeric_cols)
         func = st.selectbox("Aggregation function:", ["mean", "sum", "count"])
 
-        result = df.groupby(group_col)[agg_col].agg(func)
-        st.bar_chart(result)
+        with st.spinner("📊 Aggregating data..."):
+            time.sleep(0.6)
 
+            result = df.groupby(group_col)[agg_col].agg(func)
+            st.bar_chart(result)
 
     #outlier
     elif adv_chart == "Outlier Detection":
         metric_col = st.selectbox("Select numeric column:", numeric_cols)
 
-        Q1 = df[metric_col].quantile(0.25)
-        Q3 = df[metric_col].quantile(0.75)
-        IQR = Q3 - Q1
+        with st.spinner("🧪 Detecting outliers..."):
+            time.sleep(0.6)
 
-        lower = Q1 - 1.5 * IQR
-        upper = Q3 + 1.5 * IQR
+            Q1 = df[metric_col].quantile(0.25)
+            Q3 = df[metric_col].quantile(0.75)
+            IQR = Q3 - Q1
 
-        outliers = df[(df[metric_col] < lower) | (df[metric_col] > upper)]
+            lower = Q1 - 1.5 * IQR
+            upper = Q3 + 1.5 * IQR
 
-        st.warning(f"Found {len(outliers)} outliers in **{metric_col}**")
+            outliers = df[(df[metric_col] < lower) | (df[metric_col] > upper)]
 
-        fig, ax = plt.subplots()
-        ax.boxplot(df[metric_col].dropna())
-        ax.set_title(f"Outlier Detection for {metric_col}")
-        st.pyplot(fig)
+            st.warning(f"Found {len(outliers)} outliers in **{metric_col}**")
 
-        with st.expander("Show Outlier Rows"):
-            st.write(outliers)
+            fig, ax = plt.subplots()
+            ax.boxplot(df[metric_col].dropna())
+            ax.set_title(f"Outlier Detection for {metric_col}")
+            st.pyplot(fig)
+
+            with st.expander("Show Outlier Rows"):
+                st.write(outliers)
+
 
 
 if page == "🧠 Data Prediction":
 
     st.header("🧠 Modelling & Prediction")
 
-   
+    
     if "df_processed" not in st.session_state:
         st.error("❌ Please complete Data Pre-processing first. Missing values and feature engineering")
         st.stop()
@@ -573,6 +599,7 @@ if page == "🧠 Data Prediction":
 
     st.success("Processed dataset loaded successfully!")
 
+    
     st.subheader("🎯 Feature & Target Selection")
 
     target_col = "AQI"
@@ -598,7 +625,7 @@ if page == "🧠 Data Prediction":
     X = df[selected_features]
     y = df[target_col]
 
-#test train
+    #test train
     st.subheader("✂ Train-Test Split")
 
     test_size = st.slider("Test size (%)", 10, 40, 20) / 100
@@ -611,7 +638,7 @@ if page == "🧠 Data Prediction":
 
     st.info(f"Training rows: {len(X_train)} | Testing rows: {len(X_test)}")
 
-#comparison
+    #Comparison
     st.markdown("---")
     st.subheader("📊 Model Comparison")
 
@@ -627,15 +654,14 @@ if page == "🧠 Data Prediction":
 
     if st.button("📊 Compare Models"):
 
-        with st.spinner("Training models and evaluating..."):
+        with st.spinner("⏳ Training models and evaluating..."):
+            import time
+            time.sleep(0.5)
 
             models = {
                 "Linear Regression": LinearRegression(),
                 "Decision Tree": DecisionTreeRegressor(max_depth=6, random_state=42),
-                "Random Forest": RandomForestRegressor(
-                    n_estimators=100,
-                    random_state=42
-                )
+                "Random Forest": RandomForestRegressor(n_estimators=100, random_state=42)
             }
 
             results = []
@@ -651,13 +677,11 @@ if page == "🧠 Data Prediction":
                     "RMSE": round(np.sqrt(mean_squared_error(y_test, preds)), 2)
                 })
 
-            results_df = pd.DataFrame(results).sort_values(
-                "R² Score", ascending=False
-            )
+            results_df = pd.DataFrame(results).sort_values("R² Score", ascending=False)
 
             st.session_state["model_comparison"] = results_df
 
-    #display
+    #Display Model
     if st.session_state["model_comparison"] is not None:
 
         st.subheader("📋 Model Performance Comparison")
@@ -676,17 +700,14 @@ if page == "🧠 Data Prediction":
 
         st.success(f"🏆 Best Model: **{best_model_name}** (R² = {best_r2})")
 
-    #Train best model
+    #AQI Prediction
     st.markdown("---")
     st.subheader("🔮 AQI Prediction")
 
     model_map = {
         "Linear Regression": LinearRegression(),
         "Decision Tree": DecisionTreeRegressor(max_depth=6, random_state=42),
-        "Random Forest": RandomForestRegressor(
-            n_estimators=100,
-            random_state=42
-        )
+        "Random Forest": RandomForestRegressor(n_estimators=100, random_state=42)
     }
 
     chosen_model_name = st.selectbox(
@@ -695,7 +716,10 @@ if page == "🧠 Data Prediction":
     )
 
     model = model_map[chosen_model_name]
-    model.fit(X_train, y_train)
+
+    with st.spinner(f"⏳ Training {chosen_model_name}..."):
+        model.fit(X_train, y_train)
+        time.sleep(0.5)
 
     st.markdown("### 🧪 Enter feature values")
 
@@ -707,9 +731,10 @@ if page == "🧠 Data Prediction":
         )
 
     if st.button("📈 Predict AQI"):
-        input_df = pd.DataFrame([user_input])
-        prediction = model.predict(input_df)[0]
-
+        with st.spinner("🔮 Calculating prediction..."):
+            input_df = pd.DataFrame([user_input])
+            prediction = model.predict(input_df)[0]
+            time.sleep(0.5)
         st.success(f"🌍 **Predicted AQI:** {round(prediction, 2)}")
 
     st.markdown("---")
