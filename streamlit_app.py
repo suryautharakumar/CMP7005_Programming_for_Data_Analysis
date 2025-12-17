@@ -703,6 +703,7 @@ if page == "🧠 Data Prediction":
     #AQI Prediction
     st.markdown("---")
     st.subheader("🔮 AQI Prediction")
+    st.write("Must complete missing value & feature engineering to avoid runtime error")
 
     model_map = {
         "Linear Regression": LinearRegression(),
