@@ -402,9 +402,7 @@ if page == "📊 Data Visualization":
 
     df = st.session_state["df_processed"]
 
-    # -----------------------------------------------------------
-    # QUICK SUMMARY
-    # -----------------------------------------------------------
+
     st.subheader("✨ Quick Summary")
 
     col1, col2, col3, col4 = st.columns(4)
@@ -415,9 +413,7 @@ if page == "📊 Data Visualization":
 
     st.markdown("---")
 
-    # -----------------------------------------------------------
-    # CUSTOM VISUALIZATION
-    # -----------------------------------------------------------
+    #custom
     st.subheader("🎨 Custom Visualization")
 
     chart_type = st.selectbox(
@@ -440,9 +436,7 @@ if page == "📊 Data Visualization":
     import numpy as np
     import time
 
-    # -----------------------------------------------------------
-    # LINE / AREA / BAR
-    # -----------------------------------------------------------
+    #Line/area/bar
     if chart_type in ["Line Chart", "Area Chart", "Bar Chart"]:
         x_axis = st.selectbox("X-axis column:", df.columns)
         y_axis = st.multiselect("Y-axis column(s):", numeric_cols)
@@ -458,9 +452,7 @@ if page == "📊 Data Visualization":
                 else:
                     st.bar_chart(df.set_index(x_axis)[y_axis])
 
-    # -----------------------------------------------------------
-    # PIE CHART
-    # -----------------------------------------------------------
+    #pie chart
     elif chart_type == "Pie Chart":
         pie_col = st.selectbox("Select categorical column:", categorical_cols)
 
@@ -474,9 +466,7 @@ if page == "📊 Data Visualization":
                 ax.set_title(f"Pie Chart of {pie_col}")
                 st.pyplot(fig)
 
-    # -----------------------------------------------------------
-    # SCATTER PLOT
-    # -----------------------------------------------------------
+    #scatter plot
     elif chart_type == "Scatter Plot":
         x = st.selectbox("X-axis (numeric):", numeric_cols)
         y = st.selectbox("Y-axis (numeric):", numeric_cols)
@@ -498,9 +488,7 @@ if page == "📊 Data Visualization":
             ax.set_title(f"{x} vs {y}")
             st.pyplot(fig)
 
-    # -----------------------------------------------------------
-    # BOXPLOT
-    # -----------------------------------------------------------
+    #boxplot
     elif chart_type == "Boxplot":
         col = st.selectbox("Select numeric column:", numeric_cols)
 
@@ -512,9 +500,7 @@ if page == "📊 Data Visualization":
             ax.set_title(f"Boxplot of {col}")
             st.pyplot(fig)
 
-    # -----------------------------------------------------------
-    # CORRELATION HEATMAP
-    # -----------------------------------------------------------
+    #Correlation
     elif chart_type == "Correlation Heatmap":
         with st.spinner("🔥 Calculating correlation matrix..."):
             time.sleep(0.6)
@@ -535,9 +521,7 @@ if page == "📊 Data Visualization":
 
     st.markdown("---")
 
-    # -----------------------------------------------------------
-    # ADVANCED VISUALIZATIONS
-    # -----------------------------------------------------------
+    #Adv
     st.subheader("🚀 Advanced Visualizations")
 
     adv_chart = st.selectbox(
@@ -549,9 +533,7 @@ if page == "📊 Data Visualization":
         ]
     )
 
-    # -----------------------------------------------------------
-    # SCATTER MATRIX
-    # -----------------------------------------------------------
+    #scatter
     if adv_chart == "Scatter Matrix":
         from pandas.plotting import scatter_matrix
 
@@ -564,9 +546,7 @@ if page == "📊 Data Visualization":
                 fig = scatter_matrix(df[selected_cols], figsize=(10, 8))
                 st.pyplot(plt.gcf())
 
-    # -----------------------------------------------------------
-    # GROUPED AGGREGATION
-    # -----------------------------------------------------------
+    #grouped
     elif adv_chart == "Grouped Aggregation":
         group_col = st.selectbox("Group by (categorical):", categorical_cols)
         agg_col = st.selectbox("Aggregate column (numeric):", numeric_cols)
@@ -578,9 +558,7 @@ if page == "📊 Data Visualization":
             result = df.groupby(group_col)[agg_col].agg(func)
             st.bar_chart(result)
 
-    # -----------------------------------------------------------
-    # OUTLIER DETECTION
-    # -----------------------------------------------------------
+    #outlier
     elif adv_chart == "Outlier Detection":
         metric_col = st.selectbox("Select numeric column:", numeric_cols)
 
@@ -612,7 +590,7 @@ if page == "🧠 Data Prediction":
 
     st.header("🧠 Modelling & Prediction")
 
-   
+    
     if "df_processed" not in st.session_state:
         st.error("❌ Please complete Data Pre-processing first. Missing values and feature engineering")
         st.stop()
@@ -621,6 +599,7 @@ if page == "🧠 Data Prediction":
 
     st.success("Processed dataset loaded successfully!")
 
+    
     st.subheader("🎯 Feature & Target Selection")
 
     target_col = "AQI"
@@ -646,7 +625,7 @@ if page == "🧠 Data Prediction":
     X = df[selected_features]
     y = df[target_col]
 
-#test train
+    #test train
     st.subheader("✂ Train-Test Split")
 
     test_size = st.slider("Test size (%)", 10, 40, 20) / 100
@@ -659,7 +638,7 @@ if page == "🧠 Data Prediction":
 
     st.info(f"Training rows: {len(X_train)} | Testing rows: {len(X_test)}")
 
-#comparison
+    #Comparison
     st.markdown("---")
     st.subheader("📊 Model Comparison")
 
@@ -675,15 +654,14 @@ if page == "🧠 Data Prediction":
 
     if st.button("📊 Compare Models"):
 
-        with st.spinner("Training models and evaluating..."):
+        with st.spinner("⏳ Training models and evaluating..."):
+            import time
+            time.sleep(0.5)
 
             models = {
                 "Linear Regression": LinearRegression(),
                 "Decision Tree": DecisionTreeRegressor(max_depth=6, random_state=42),
-                "Random Forest": RandomForestRegressor(
-                    n_estimators=100,
-                    random_state=42
-                )
+                "Random Forest": RandomForestRegressor(n_estimators=100, random_state=42)
             }
 
             results = []
@@ -699,13 +677,11 @@ if page == "🧠 Data Prediction":
                     "RMSE": round(np.sqrt(mean_squared_error(y_test, preds)), 2)
                 })
 
-            results_df = pd.DataFrame(results).sort_values(
-                "R² Score", ascending=False
-            )
+            results_df = pd.DataFrame(results).sort_values("R² Score", ascending=False)
 
             st.session_state["model_comparison"] = results_df
 
-    #display
+    #Display Model
     if st.session_state["model_comparison"] is not None:
 
         st.subheader("📋 Model Performance Comparison")
@@ -724,17 +700,14 @@ if page == "🧠 Data Prediction":
 
         st.success(f"🏆 Best Model: **{best_model_name}** (R² = {best_r2})")
 
-    #Train best model
+    #AQI Prediction
     st.markdown("---")
     st.subheader("🔮 AQI Prediction")
 
     model_map = {
         "Linear Regression": LinearRegression(),
         "Decision Tree": DecisionTreeRegressor(max_depth=6, random_state=42),
-        "Random Forest": RandomForestRegressor(
-            n_estimators=100,
-            random_state=42
-        )
+        "Random Forest": RandomForestRegressor(n_estimators=100, random_state=42)
     }
 
     chosen_model_name = st.selectbox(
@@ -743,7 +716,10 @@ if page == "🧠 Data Prediction":
     )
 
     model = model_map[chosen_model_name]
-    model.fit(X_train, y_train)
+
+    with st.spinner(f"⏳ Training {chosen_model_name}..."):
+        model.fit(X_train, y_train)
+        time.sleep(0.5)
 
     st.markdown("### 🧪 Enter feature values")
 
@@ -755,9 +731,10 @@ if page == "🧠 Data Prediction":
         )
 
     if st.button("📈 Predict AQI"):
-        input_df = pd.DataFrame([user_input])
-        prediction = model.predict(input_df)[0]
-
+        with st.spinner("🔮 Calculating prediction..."):
+            input_df = pd.DataFrame([user_input])
+            prediction = model.predict(input_df)[0]
+            time.sleep(0.5)
         st.success(f"🌍 **Predicted AQI:** {round(prediction, 2)}")
 
     st.markdown("---")
