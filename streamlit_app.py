@@ -396,11 +396,8 @@ if page == "📊 Data Visualization":
 
     st.header("📊 Data Visualization")
 
-    # -----------------------------------------------------------
-    # CHECK DATA
-    # -----------------------------------------------------------
     if "df_processed" not in st.session_state:
-        st.error("❌ No processed data found. Please complete preprocessing first. Missing values and feature engineering")
+        st.error("❌ No processed data found. Please complete preprocessing first.")
         st.stop()
 
     df = st.session_state["df_processed"]
@@ -436,19 +433,17 @@ if page == "📊 Data Visualization":
         ]
     )
 
-    numeric_cols = df.select_dtypes(include=["float", "int"]).columns.tolist()
-    categorical_cols = df.select_dtypes(include=["object", "category"]).columns.tolist()
+    numeric_cols = df.select_dtypes(include=["float", "int"]).columns
+    categorical_cols = df.select_dtypes(include=["object", "category"]).columns
 
     import matplotlib.pyplot as plt
     import numpy as np
-    import pandas as pd
     import time
 
     # -----------------------------------------------------------
-    # LINE / BAR / AREA (FIXED)
+    # LINE / AREA / BAR
     # -----------------------------------------------------------
     if chart_type in ["Line Chart", "Area Chart", "Bar Chart"]:
-
         x_axis = st.selectbox("X-axis column:", df.columns)
         y_axis = st.multiselect("Y-axis column(s):", numeric_cols)
 
@@ -456,22 +451,12 @@ if page == "📊 Data Visualization":
             with st.spinner("📊 Rendering chart..."):
                 time.sleep(0.6)
 
-                plot_df = df[[x_axis] + y_axis].copy()
-
-                # 🔑 FIX: handle categorical index
-                if not np.issubdtype(plot_df[x_axis].dtype, np.number):
-                    plot_df = plot_df.reset_index(drop=True)
-                else:
-                    plot_df = plot_df.set_index(x_axis)
-
-                plot_df = plot_df[y_axis]
-
                 if chart_type == "Line Chart":
-                    st.line_chart(plot_df)
+                    st.line_chart(df.set_index(x_axis)[y_axis])
                 elif chart_type == "Area Chart":
-                    st.area_chart(plot_df)
+                    st.area_chart(df.set_index(x_axis)[y_axis])
                 else:
-                    st.bar_chart(plot_df)
+                    st.bar_chart(df.set_index(x_axis)[y_axis])
 
     # -----------------------------------------------------------
     # PIE CHART
@@ -481,26 +466,29 @@ if page == "📊 Data Visualization":
 
         if pie_col:
             with st.spinner("🥧 Generating pie chart..."):
-                counts = df[pie_col].value_counts()
+                time.sleep(0.6)
 
                 fig, ax = plt.subplots()
+                counts = df[pie_col].value_counts()
                 ax.pie(counts, labels=counts.index, autopct="%1.1f%%")
                 ax.set_title(f"Pie Chart of {pie_col}")
                 st.pyplot(fig)
 
     # -----------------------------------------------------------
-    # SCATTER
+    # SCATTER PLOT
     # -----------------------------------------------------------
     elif chart_type == "Scatter Plot":
         x = st.selectbox("X-axis (numeric):", numeric_cols)
         y = st.selectbox("Y-axis (numeric):", numeric_cols)
-        color = st.selectbox("Group by (optional):", ["None"] + categorical_cols)
+        color = st.selectbox("Group by (optional):", ["None"] + list(categorical_cols))
 
         with st.spinner("🔵 Rendering scatter plot..."):
+            time.sleep(0.6)
+
             fig, ax = plt.subplots()
 
             if color != "None":
-                for v in df[color].dropna().unique():
+                for v in df[color].unique():
                     sub = df[df[color] == v]
                     ax.scatter(sub[x], sub[y], label=v)
                 ax.legend()
@@ -517,6 +505,8 @@ if page == "📊 Data Visualization":
         col = st.selectbox("Select numeric column:", numeric_cols)
 
         with st.spinner("📦 Generating boxplot..."):
+            time.sleep(0.6)
+
             fig, ax = plt.subplots()
             ax.boxplot(df[col].dropna())
             ax.set_title(f"Boxplot of {col}")
@@ -526,7 +516,9 @@ if page == "📊 Data Visualization":
     # CORRELATION HEATMAP
     # -----------------------------------------------------------
     elif chart_type == "Correlation Heatmap":
-        with st.spinner("🔥 Calculating correlations..."):
+        with st.spinner("🔥 Calculating correlation matrix..."):
+            time.sleep(0.6)
+
             corr = df[numeric_cols].corr()
 
             fig, ax = plt.subplots(figsize=(8, 6))
@@ -563,19 +555,17 @@ if page == "📊 Data Visualization":
     if adv_chart == "Scatter Matrix":
         from pandas.plotting import scatter_matrix
 
-        selected_cols = st.multiselect(
-            "Select up to 5 numeric columns:",
-            numeric_cols,
-            max_selections=5
-        )
+        selected_cols = st.multiselect("Select up to 5 numeric columns:", numeric_cols)
 
         if selected_cols:
             with st.spinner("🧬 Creating scatter matrix..."):
+                time.sleep(0.6)
+
                 fig = scatter_matrix(df[selected_cols], figsize=(10, 8))
                 st.pyplot(plt.gcf())
 
     # -----------------------------------------------------------
-    # GROUPED AGGREGATION (FIXED)
+    # GROUPED AGGREGATION
     # -----------------------------------------------------------
     elif adv_chart == "Grouped Aggregation":
         group_col = st.selectbox("Group by (categorical):", categorical_cols)
@@ -583,16 +573,10 @@ if page == "📊 Data Visualization":
         func = st.selectbox("Aggregation function:", ["mean", "sum", "count"])
 
         with st.spinner("📊 Aggregating data..."):
-            agg_df = (
-                df.groupby(group_col)[agg_col]
-                .agg(func)
-                .reset_index()
-            )
+            time.sleep(0.6)
 
-            # 🔑 FIX: force numeric index
-            plot_df = agg_df.set_index(group_col)
-
-            st.bar_chart(plot_df)
+            result = df.groupby(group_col)[agg_col].agg(func)
+            st.bar_chart(result)
 
     # -----------------------------------------------------------
     # OUTLIER DETECTION
@@ -601,6 +585,8 @@ if page == "📊 Data Visualization":
         metric_col = st.selectbox("Select numeric column:", numeric_cols)
 
         with st.spinner("🧪 Detecting outliers..."):
+            time.sleep(0.6)
+
             Q1 = df[metric_col].quantile(0.25)
             Q3 = df[metric_col].quantile(0.75)
             IQR = Q3 - Q1
@@ -618,7 +604,8 @@ if page == "📊 Data Visualization":
             st.pyplot(fig)
 
             with st.expander("Show Outlier Rows"):
-                st.dataframe(outliers, use_container_width=True)
+                st.write(outliers)
+
 
 
 if page == "🧠 Data Prediction":
