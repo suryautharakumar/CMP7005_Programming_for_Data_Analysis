@@ -590,7 +590,7 @@ if page == "🧠 Data Prediction":
 
     st.header("🧠 Modelling & Prediction")
 
-    
+   
     if "df_processed" not in st.session_state:
         st.error("❌ Please complete Data Pre-processing first. Missing values and feature engineering")
         st.stop()
@@ -599,7 +599,6 @@ if page == "🧠 Data Prediction":
 
     st.success("Processed dataset loaded successfully!")
 
-    
     st.subheader("🎯 Feature & Target Selection")
 
     target_col = "AQI"
@@ -625,7 +624,7 @@ if page == "🧠 Data Prediction":
     X = df[selected_features]
     y = df[target_col]
 
-    #test train
+#test train
     st.subheader("✂ Train-Test Split")
 
     test_size = st.slider("Test size (%)", 10, 40, 20) / 100
@@ -638,7 +637,7 @@ if page == "🧠 Data Prediction":
 
     st.info(f"Training rows: {len(X_train)} | Testing rows: {len(X_test)}")
 
-    #Comparison
+#comparison
     st.markdown("---")
     st.subheader("📊 Model Comparison")
 
@@ -654,14 +653,15 @@ if page == "🧠 Data Prediction":
 
     if st.button("📊 Compare Models"):
 
-        with st.spinner("⏳ Training models and evaluating..."):
-            import time
-            time.sleep(0.5)
+        with st.spinner("Training models and evaluating..."):
 
             models = {
                 "Linear Regression": LinearRegression(),
                 "Decision Tree": DecisionTreeRegressor(max_depth=6, random_state=42),
-                "Random Forest": RandomForestRegressor(n_estimators=100, random_state=42)
+                "Random Forest": RandomForestRegressor(
+                    n_estimators=100,
+                    random_state=42
+                )
             }
 
             results = []
@@ -677,11 +677,13 @@ if page == "🧠 Data Prediction":
                     "RMSE": round(np.sqrt(mean_squared_error(y_test, preds)), 2)
                 })
 
-            results_df = pd.DataFrame(results).sort_values("R² Score", ascending=False)
+            results_df = pd.DataFrame(results).sort_values(
+                "R² Score", ascending=False
+            )
 
             st.session_state["model_comparison"] = results_df
 
-    #Display Model
+    #display
     if st.session_state["model_comparison"] is not None:
 
         st.subheader("📋 Model Performance Comparison")
@@ -700,14 +702,17 @@ if page == "🧠 Data Prediction":
 
         st.success(f"🏆 Best Model: **{best_model_name}** (R² = {best_r2})")
 
-    #AQI Prediction
+    #Train best model
     st.markdown("---")
     st.subheader("🔮 AQI Prediction")
 
     model_map = {
         "Linear Regression": LinearRegression(),
         "Decision Tree": DecisionTreeRegressor(max_depth=6, random_state=42),
-        "Random Forest": RandomForestRegressor(n_estimators=100, random_state=42)
+        "Random Forest": RandomForestRegressor(
+            n_estimators=100,
+            random_state=42
+        )
     }
 
     chosen_model_name = st.selectbox(
@@ -716,10 +721,7 @@ if page == "🧠 Data Prediction":
     )
 
     model = model_map[chosen_model_name]
-
-    with st.spinner(f"⏳ Training {chosen_model_name}..."):
-        model.fit(X_train, y_train)
-        time.sleep(0.5)
+    model.fit(X_train, y_train)
 
     st.markdown("### 🧪 Enter feature values")
 
@@ -731,10 +733,9 @@ if page == "🧠 Data Prediction":
         )
 
     if st.button("📈 Predict AQI"):
-        with st.spinner("🔮 Calculating prediction..."):
-            input_df = pd.DataFrame([user_input])
-            prediction = model.predict(input_df)[0]
-            time.sleep(0.5)
+        input_df = pd.DataFrame([user_input])
+        prediction = model.predict(input_df)[0]
+
         st.success(f"🌍 **Predicted AQI:** {round(prediction, 2)}")
 
     st.markdown("---")
