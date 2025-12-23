@@ -5,6 +5,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import io
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 
 # 79d125 - green
 # 06d4fc - blue
@@ -432,9 +436,6 @@ if page == "📊 Data Visualization":
     numeric_cols = df.select_dtypes(include=["float", "int"]).columns
     categorical_cols = df.select_dtypes(include=["object", "category"]).columns
 
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import time
 
     #Line/area/bar
     if chart_type in ["Line Chart", "Area Chart", "Bar Chart"]:
@@ -642,12 +643,6 @@ if page == "🧠 Data Prediction":
     st.markdown("---")
     st.subheader("📊 Model Comparison")
 
-    from sklearn.linear_model import LinearRegression
-    from sklearn.tree import DecisionTreeRegressor
-    from sklearn.ensemble import RandomForestRegressor
-    from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
-    import numpy as np
-    import pandas as pd
 
     if "model_comparison" not in st.session_state:
         st.session_state["model_comparison"] = None
